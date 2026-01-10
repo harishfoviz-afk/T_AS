@@ -90,7 +90,7 @@ const MagneticButton = () => {
         }}
         className="bg-brand-orange text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl hover:shadow-orange-500/40 transition-all border-2 border-brand-orange"
       >
-        Start Learning Fitment Analysis <span className="blink-arrow-bold">→</span>
+        Start Learning Fitment Analysis <span className="hero-arrow-massive">→</span>
       </motion.button>
     </div>
   );
@@ -99,6 +99,13 @@ const MagneticButton = () => {
 const Hero = () => {
   return (
     <section className="relative pt-40 pb-28 px-4 overflow-hidden bg-brand-navy min-h-[90vh] flex flex-col items-center justify-center">
+      {/* Top Branding */}
+      <div className="hero-top-nav">
+          <span className="font-extrabold text-white text-2xl">Apt <span className="text-brand-orange">Skola</span></span>
+          <span className="w-px h-6 bg-slate-700"></span>
+          <span className="text-sm font-medium tracking-wide uppercase text-slate-400">A Foviz Venture</span>
+      </div>
+
       {/* Background Glows */}
       <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-brand-orange/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-[150px] pointer-events-none" />
@@ -111,15 +118,9 @@ const Hero = () => {
         </div>
         
         <SlotHeadline />
+        <p className="text-brand-orange font-bold text-xl md:text-2xl mt-4 uppercase tracking-wider text-center">Find Your Child's Perfect School Board</p>
         <PulsingSubtext />
         <MagneticButton />
-      </div>
-      
-      {/* Brand Badge */}
-      <div className="mt-24 text-slate-500 flex items-center gap-4 opacity-80 hover:opacity-100 transition-opacity">
-        <span className="font-extrabold text-white text-3xl">Apt <span className="text-brand-orange">Skola</span></span>
-        <span className="w-px h-6 bg-slate-700"></span>
-        <span className="text-sm font-medium tracking-wide uppercase">A Foviz Venture</span>
       </div>
 
       {/* Quick Links Replacement */}

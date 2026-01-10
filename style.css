@@ -324,3 +324,30 @@ footer .policy-links a { margin: 0 8px; color: #CBD5E1; text-decoration: none; f
     animation: fastBlink 0.8s infinite; 
     margin-left: 8px; 
 }
+
+/* Hero Massive Arrow and Top Nav */
+@keyframes arrow-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.hero-arrow-massive { 
+    font-size: 3.2rem !important; 
+    font-weight: 900 !important; 
+    margin-left: 15px; 
+    animation: arrow-blink 0.8s steps(1) infinite; 
+    vertical-align: middle; 
+    line-height: 0; 
+}
+
+.hero-top-nav { 
+    position: absolute; 
+    top: 2.5rem; 
+    left: 0; 
+    right: 0; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    gap: 1.5rem; 
+    z-index: 100; 
+}
