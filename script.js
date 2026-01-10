@@ -117,8 +117,10 @@ window.showPsychometricHistogram = function() {
 
 window.showPhase1BridgeCard = function() {
     const container = document.getElementById('dynamicQuizContent');
+    if (!container) return;
+
     container.innerHTML = `
-        <div class="bg-slate-50 border-2 border-brand-orange rounded-3xl p-8 shadow-2xl">
+        <div class="bg-slate-50 border-2 border-brand-orange rounded-3xl p-8 shadow-2xl animate-fade-in-up">
             <h2 class="text-3xl font-extrabold text-brand-navy mb-6 text-center">Deep-Dive Assessment: Phase 1</h2>
             <p class="text-lg text-slate-700 mb-8 leading-relaxed text-center">You’ve mastered the basics! Now, it’s time for a precision analysis to unlock your child’s detailed fitment roadmap.</p>
             <div class="space-y-4 mb-10">
@@ -126,7 +128,8 @@ window.showPhase1BridgeCard = function() {
                 <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-200"><div class="text-brand-orange text-2xl font-black">02</div><div class="text-brand-navy font-bold">Instant Fitment Score for CBSE, ICSE, and IB</div></div>
                 <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-200"><div class="text-brand-orange text-2xl font-black">03</div><div class="text-brand-navy font-bold">Actionable Roadmap to a 2040 Global Career</div></div>
             </div>
-            <button onclick="window.initializeQuizShell(4)" class="w-full bg-brand-orange text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all">Analyze My Child’s Fitment Board →</button>
+            <button onclick="window.initializeQuizShell(4)" class="w-full bg-brand-orange text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all mb-4">Analyze My Child’s Fitment Board →</button>
+            <p class="text-sm text-slate-500 italic text-center px-4 leading-relaxed">Note: Upon completion, your inputs will generate your Smart Parent Pro Dashboard. Based on your unique data, our engine will recommend the optimal analysis path—ranging from Behavioral Fitment to the comprehensive Institutional Alignment Matrix</p>
         </div>`;
 };
 
@@ -157,7 +160,6 @@ const questions = [
 // --- FALLBACK ---
 document.addEventListener('click', function(e) {
     if (e.target.innerText && e.target.innerText.includes('Start Learning Fitment Analysis')) {
-        console.log("Fallback: Initializing Phase 0...");
         window.initializeQuizShell(0);
     }
 });
