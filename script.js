@@ -1,3 +1,4 @@
+// --- GLOBAL UTILITIES & funnel ---
 window.phase0Complete = false;
 window.hideAllSections = function hideAllSections() {
     const sections = ['landingPage', 'aboutAptSkola', 'pricing', 'invest-in-clarity', 'testimonials', 'educatorPartner', 'contact-and-policies', 'mainFooter', 'detailsPage', 'paymentPageContainer', 'questionPages', 'successPage', 'syncMatchGate', 'syncMatchTransition', 'react-hero-root'];
@@ -143,11 +144,17 @@ window.showPsychometricHistogram = function() {
 
 window.showSystemicRiskCard = function() {
     const container = document.getElementById('dynamicQuizContent');
+    // Using a pop-up style overlay instead of a shaky block
     container.innerHTML = `
-        <div class="p-8 bg-red-50 border-2 border-red-500 rounded-3xl text-center animate-shake">
-            <h2 class="text-3xl font-black text-red-600 mb-4">SYSTEMIC RISK DETECTED</h2>
-            <p class="text-red-900 font-bold mb-6">Phase 0 data shows a significant conflict between natural learning velocity and standard curriculum logic.</p>
-            <button onclick="window.showPhase1BridgeCard()" class="bg-red-600 text-white px-10 py-4 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all">RESOLVE CONFLICT & START PHASE 1 →</button>
+        <div class="fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-brand-navy/80 backdrop-blur-sm animate-fade-in">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-lg w-full text-center border-t-8 border-red-500">
+                <div class="text-red-500 text-5xl mb-6 font-black uppercase">⚠️ RISK</div>
+                <h2 class="text-2xl font-black text-brand-navy mb-4 uppercase">Systemic Risk Detected</h2>
+                <p class="text-slate-600 font-medium mb-8 leading-relaxed">Phase 0 data indicates a significant misalignment between natural cognitive syntax and standardized board expectations.</p>
+                <button onclick="window.showPhase1BridgeCard()" class="w-full bg-red-600 text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all">
+                    RESOLVE & START PHASE 1 →
+                </button>
+            </div>
         </div>`;
 };
 
@@ -169,9 +176,9 @@ window.showPhase1BridgeCard = function() {
 
 window.triggerDNAFinalization = function() {
     window.hideAllSections();
-    const container = document.getElementById('questionPages');
-    container.classList.remove('hidden'); container.classList.add('active'); container.style.display = 'flex';
-    const labels = ['Neural Processing', 'Stress Threshold', 'Instructional Syntax', 'Fiscal Range', 'Global Parity'];
+    const container = document.getElementById("questionPages");
+    container.classList.remove("hidden"); container.classList.add("active"); container.style.display = "flex";
+    const labels = ["Neural Processing", "Stress Threshold", "Instructional Syntax", "Fiscal Range", "Global Parity"];
     container.innerHTML = `
         <div class="min-h-screen w-full bg-brand-navy flex flex-col items-center justify-center p-8 relative overflow-hidden">
             <div id="finalGlass" class="absolute inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
@@ -207,6 +214,7 @@ window.triggerDNAFinalization = function() {
         }
     }, 150);
 };
+
 // --- FORCE DOMAIN CONSISTENCY ---
 if (location.hostname !== 'localhost' && location.hostname === 'www.aptskola.com') {
     location.replace(location.href.replace('www.', ''));
