@@ -1,6 +1,11 @@
-// Ensure React and FramerMotion are available globally from CDN
+// Ensure React and Motion are available globally from CDN
 const { useState, useEffect, useRef } = React;
-const { motion, AnimatePresence } = FramerMotion;
+// Framer Motion global is often 'Motion' or 'FramerMotion' depending on CDN
+const { motion, AnimatePresence } = window.Motion || window.FramerMotion || {};
+
+if (!motion) {
+    console.error("Framer Motion not found. Please check CDN scripts.");
+}
 
 const SlotHeadline = () => {
   const words = ["Stop Worrying", "Stop Doubting", "Stop Guessing", "Start Knowing"];
@@ -54,6 +59,7 @@ const MagneticButton = () => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
   const handleMouseMove = (e) => {
+    if (!buttonRef.current) return;
     const { clientX, clientY } = e;
     const { left, top, width, height } = buttonRef.current.getBoundingClientRect();
     const centerX = left + width / 2;
@@ -130,5 +136,8 @@ const Hero = () => {
 };
 
 // Render the component
-const root = ReactDOM.createRoot(document.getElementById('react-hero-root'));
-root.render(<Hero />);
+const container = document.getElementById('react-hero-root');
+if (container) {
+    const root = ReactDOM.createRoot(container);
+    root.render(<Hero />);
+}

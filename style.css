@@ -286,3 +286,9 @@ footer .policy-links a { margin: 0 8px; color: #CBD5E1; text-decoration: none; f
     background: var(--navy-premium);
     color: white;
 }
+
+/* Fix for React Hero Root */
+#react-hero-root {
+    min-height: 90vh;
+    background: var(--navy-premium);
+}
