@@ -351,3 +351,8 @@ footer .policy-links a { margin: 0 8px; color: #CBD5E1; text-decoration: none; f
     gap: 1.5rem; 
     z-index: 100; 
 }
+
+/* Force Active Visibility */
+.active { 
+    display: flex !important; 
+}

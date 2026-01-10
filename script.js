@@ -34,16 +34,6 @@ window.initializeQuizShell = function initializeQuizShell(index) {
     }
 };
 
-// --- FORCE DOMAIN CONSISTENCY ---
-if (location.hostname !== 'localhost' && location.hostname === 'www.aptskola.com') {
-    location.replace(location.href.replace('www.', ''));
-}
-
-// --- FORCE HTTPS ---
-if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-    location.replace(`https:${location.href.substring(location.protocol.length)}`);
-}
-
 // --- CONFIG ---
 const RAZORPAY_KEY_ID = "rzp_live_RxHmfgMlTRV3Su";
 const EMAILJS_PUBLIC_KEY = "GJEWFtAL7s231EDrk";
@@ -317,7 +307,7 @@ const questions = [
     }
 ];
 
-function showSection(id) {
+window.showSection = function showSection(id) {
     const el = document.getElementById(id);
     if (el) {
         el.classList.remove('hidden');
@@ -326,13 +316,13 @@ function showSection(id) {
     }
 }
 
-function handlePrev() {
+window.handlePrev = function handlePrev() {
     if (currentQuestion > 0) {
         renderQuestionContent(currentQuestion - 1);
     }
 }
 
-function goToLandingPage() { location.reload(); }
+window.goToLandingPage = function goToLandingPage() { location.reload(); }
 
 function updateProgressBar(index) {
     let label = "Phase 0: DNA Scan";
@@ -358,7 +348,7 @@ function updateProgressBar(index) {
     return { label, progressClass, progress, displayIdx };
 }
 
-function renderQuestionContent(index) {
+window.renderQuestionContent = function renderQuestionContent(index) {
     currentQuestion = index;
     if (index === 4 && answers.p0_q4 !== undefined && !answers.p0_done) {
         answers.p0_done = true;
@@ -413,7 +403,7 @@ function renderQuestionContent(index) {
     }
 }
 
-function selectOption(id, val, idx, el) {
+window.selectOption = function selectOption(id, val, idx, el) {
     answers[id] = val;
     el.classList.add('selected');
     setTimeout(() => renderQuestionContent(idx + 1), 300);
@@ -435,7 +425,7 @@ function renderLogicBridge() {
     }
 }
 
-function transitionToPhase1() {
+window.transitionToPhase1 = function transitionToPhase1() {
     const dynamicContent = document.getElementById('dynamicQuizContent');
     if (dynamicContent) {
         dynamicContent.innerHTML = `
@@ -451,4 +441,4 @@ function transitionToPhase1() {
     }, 3000);
 }
 
-// ... all other functions ...
+// ... all other functions should be here and attached to window if needed ...

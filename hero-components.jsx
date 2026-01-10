@@ -77,7 +77,7 @@ const MagneticButton = () => {
   const handleMouseLeave = () => setPosition({ x: 0, y: 0 });
 
   const handleClick = () => {
-    console.log("React: Button clicked. Checking window.initializeQuizShell...");
+    console.log("React: Button clicked. window.initializeQuizShell is:", typeof window.initializeQuizShell);
     if (typeof window.initializeQuizShell === 'function') {
       console.log("React: Calling window.initializeQuizShell(0)");
       window.initializeQuizShell(0);
