@@ -76,6 +76,16 @@ const MagneticButton = () => {
 
   const handleMouseLeave = () => setPosition({ x: 0, y: 0 });
 
+  const handleClick = () => {
+    console.log("React: Button clicked. Checking window.initializeQuizShell...");
+    if (typeof window.initializeQuizShell === 'function') {
+      console.log("React: Calling window.initializeQuizShell(0)");
+      window.initializeQuizShell(0);
+    } else {
+      console.error("React: window.initializeQuizShell is NOT a function!", window.initializeQuizShell);
+    }
+  };
+
   return (
     <div className="flex justify-center mt-14">
       <motion.button
@@ -83,11 +93,7 @@ const MagneticButton = () => {
         animate={{ x: position.x, y: position.y }}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        onClick={() => {
-          if (typeof window.initializeQuizShell === 'function') {
-            window.initializeQuizShell(0);
-          }
-        }}
+        onClick={handleClick}
         className="bg-brand-orange text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl hover:shadow-orange-500/40 transition-all border-2 border-brand-orange"
       >
         Start Learning Fitment Analysis <span className="hero-arrow-massive">→</span>
