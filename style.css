@@ -292,3 +292,22 @@ footer .policy-links a { margin: 0 8px; color: #CBD5E1; text-decoration: none; f
     min-height: 90vh;
     background: var(--navy-premium);
 }
+
+/* Overhauled Hero Component Visuals */
+.btn-fill-hover {
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.btn-fill-hover:hover {
+    background-color: var(--sunrise-primary) !important;
+    border-color: var(--sunrise-primary) !important;
+}
+
+/* Increase Apt Skola brand span in the footer/hero */
+#mainFooter p, .brand-logo-container, .brand-badge-text {
+    font-size: 1.5rem;
+}
+
+.brand-badge-text span {
+    font-size: 3rem;
+}

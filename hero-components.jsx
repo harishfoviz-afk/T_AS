@@ -8,7 +8,7 @@ if (!motion) {
 }
 
 const SlotHeadline = () => {
-  const words = ["Stop Worrying", "Stop Doubting", "Stop Guessing", "Start Knowing"];
+  const words = ["Worrying", "Doubting", "Guessing", "Knowing"];
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -18,27 +18,27 @@ const SlotHeadline = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const colors = ["text-orange-300", "text-blue-300", "text-orange-300", "text-brand-orange"];
+
   return (
-    <div className="h-24 md:h-32 overflow-hidden flex items-center justify-center">
-      <AnimatePresence mode="wait">
-        <motion.h1
-          key={words[index]}
-          initial={{ y: 40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -40, opacity: 0 }}
-          transition={{ duration: 0.5, ease: "backOut" }}
-          className="text-4xl md:text-7xl font-extrabold text-white text-center leading-tight"
-        >
-          {words[index].includes("Start") ? (
-            <>
-              {words[index].split(" ")[0]}{" "}
-              <span className="text-brand-orange">{words[index].split(" ")[1]}</span>
-            </>
-          ) : (
-            words[index]
-          )}
-        </motion.h1>
-      </AnimatePresence>
+    <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 h-32 md:h-40">
+      <h1 className="text-4xl md:text-7xl font-extrabold text-white text-center leading-tight">
+        {words[index] === "Knowing" ? "START" : "STOP"}
+      </h1>
+      <div className="overflow-hidden h-16 md:h-24 flex items-center">
+        <AnimatePresence mode="wait">
+          <motion.h1
+            key={words[index]}
+            initial={{ y: 40, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -40, opacity: 0 }}
+            transition={{ duration: 0.5, ease: "backOut" }}
+            className={`text-4xl md:text-7xl font-extrabold text-center leading-tight ${colors[index]}`}
+          >
+            {words[index]}
+          </motion.h1>
+        </AnimatePresence>
+      </div>
     </div>
   );
 };
@@ -86,11 +86,13 @@ const MagneticButton = () => {
         onClick={() => {
           if (typeof window.scrollToPhase0 === 'function') {
             window.scrollToPhase0();
+          } else if (typeof window.initializeQuizShell === 'function') {
+            window.initializeQuizShell(0);
           }
         }}
-        className="bg-brand-orange text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl hover:shadow-orange-500/40 transition-shadow border-2 border-orange-400/20"
+        className="btn-fill-hover bg-transparent text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl hover:shadow-orange-500/40 transition-all border-2 border-brand-orange"
       >
-        Start Learning Fitment Analysis →
+        Start Learning Fitment Analysis <span className="animate-pulse">→</span>
       </motion.button>
     </div>
   );
@@ -117,7 +119,7 @@ const Hero = () => {
       
       {/* Brand Badge */}
       <div className="mt-24 text-slate-500 flex items-center gap-4 opacity-80 hover:opacity-100 transition-opacity">
-        <span className="font-extrabold text-white text-lg">Apt <span className="text-brand-orange">Skola</span></span>
+        <span className="font-extrabold text-white text-3xl">Apt <span className="text-brand-orange">Skola</span></span>
         <span className="w-px h-6 bg-slate-700"></span>
         <span className="text-sm font-medium tracking-wide uppercase">A Foviz Venture</span>
       </div>

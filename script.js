@@ -330,7 +330,7 @@ function validateInputs(e, p) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e) && /
 
 function goToLandingPage() { location.reload(); }
 
-function initializeQuizShell(index) {
+window.initializeQuizShell = function initializeQuizShell(index) {
     hideAllSections();
     const container = document.getElementById('questionPages');
     container.classList.remove('hidden');
