@@ -100,6 +100,10 @@
     </script>
     
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
 
     <script type="application/ld+json">
     {
@@ -140,35 +144,8 @@
 
 <body>
 <div id="landingPage">
-    <header class="relative overflow-hidden bg-brand-navy pb-20">
-        <div class="absolute top-6 right-6 flex gap-4 z-50">
-            <button onclick="openSyncMatchGate()" class="text-xs font-bold text-slate-400 border border-slate-700 px-4 py-2 rounded-full hover:bg-slate-800 transition">
-                Unlock Parent & Child Sync Check
-            </button>
-            <a href="https://xray.aptskola.com" target="_blank" class="text-xs font-bold text-slate-400 border border-slate-700 px-4 py-2 rounded-full hover:bg-slate-800 transition">
-                🔎 AI School/College Forensic Report
-            </a>
-        </div>
-
-        <div class="absolute top-6 right-6 flex gap-4 z-50">
-        </div>
-
-		<div class="brand-logo-container">
-			Apt <span style="color: #FF6B35;">Skola</span> 
-			<span style="font-weight: 400; color: #CBD5E1; margin-left: 8px; border-left: 1px solid rgba(203, 213, 225, 0.3); padding-left: 12px;">A Foviz Venture</span>
-		</div>
-
-		<div class="urgency-banner">⚡ Limited Time: 40% OFF - Offer ends soon</div>
-
-		<h1>Stop Guessing. <span style="color: #FF6B35;">Start Knowing.</span><br>Find Your Child's Perfect School Board</h1>
-		
-		<p class="subheadline">
-			Get a scientific, personalized board recommendation based on your child's unique psychology in 5 minutes.
-		</p>
-
-		<button type="button" onclick="scrollToPhase0()" class="hero-btn-primary">
-			Start Learning Fitment Analysis
-		</button>
+    <header class="bg-brand-navy">
+        <div id="react-hero-root"></div>
     </header>
 
 	<section id="aboutAptSkola" class="py-10 bg-white">
@@ -841,6 +818,7 @@
         </div>
     </div>
 
+    <script type="text/babel" src="hero-components.jsx"></script>
     <script src="script.js"></script>
 </body>
 </html>
