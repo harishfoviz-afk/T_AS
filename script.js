@@ -1,3 +1,10 @@
+// --- STATE MANAGEMENT ---
+window.phase0Complete = false;
+let currentQuestion = 0;
+let answers = {};
+let customerData = { orderId: 'N/A', childAge: '5-10' };
+let isSyncMatchMode = false;
+
 // --- GLOBAL BRIDGE ---
 window.hideAllSections = function hideAllSections() {
     const sections = ['landingPage', 'aboutAptSkola', 'pricing', 'invest-in-clarity', 'testimonials', 'educatorPartner', 'contact-and-policies', 'mainFooter', 'detailsPage', 'paymentPageContainer', 'questionPages', 'successPage', 'syncMatchGate', 'syncMatchTransition', 'react-hero-root'];
@@ -41,7 +48,8 @@ window.renderQuestionContent = function renderQuestionContent(index) {
     const quizContent = document.getElementById('dynamicQuizContent');
     if (!quizContent) return;
 
-    if (index === 4 && !isSyncMatchMode) {
+    // Trigger Histogram only if Phase 0 just finished and we haven't shown it yet
+    if (index === 4 && !isSyncMatchMode && !window.phase0Complete) {
         window.showPsychometricHistogram();
         return;
     }
@@ -49,8 +57,12 @@ window.renderQuestionContent = function renderQuestionContent(index) {
     const q = questions[index];
     if(!q) return;
 
-    const displayTotal = isSyncMatchMode ? 30 : 15;
-    const progressPercent = ((index + 1) / displayTotal * 100).toFixed(0);
+    // Calculate Dynamic UI values for numbering
+    const isPhase0 = index < 4;
+    const displayTotal = isPhase0 ? 4 : (isSyncMatchMode ? 30 : 15);
+    const currentQNum = isPhase0 ? index + 1 : (isSyncMatchMode ? index + 1 : index - 3);
+    const progressPercent = (currentQNum / displayTotal * 100).toFixed(0);
+    const phaseLabel = isPhase0 ? "Phase 0: DNA Scan" : "Phase 1: Fitment Analysis";
 
     quizContent.innerHTML = `
         <div class="progress-container mb-10">
@@ -58,8 +70,8 @@ window.renderQuestionContent = function renderQuestionContent(index) {
                 <div class="progress-fill h-full bg-brand-orange transition-all duration-500" style="width: ${progressPercent}%"></div>
             </div>
             <div class="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-widest">
-                <span>${index < 4 ? "Phase 0: DNA Scan" : "Phase 1: Fitment Analysis"}</span>
-                <span>Question ${index + 1} / ${displayTotal}</span>
+                <span>${phaseLabel}</span>
+                <span>Question ${currentQNum} / ${displayTotal}</span>
             </div>
         </div>
         <div class="question-text text-3xl font-extrabold text-brand-navy mb-10 leading-tight">${q.text}</div>
@@ -128,17 +140,16 @@ window.showPhase1BridgeCard = function() {
                 <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-200"><div class="text-brand-orange text-2xl font-black">02</div><div class="text-brand-navy font-bold">Instant Fitment Score for CBSE, ICSE, and IB</div></div>
                 <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-200"><div class="text-brand-orange text-2xl font-black">03</div><div class="text-brand-navy font-bold">Actionable Roadmap to a 2040 Global Career</div></div>
             </div>
-            <button onclick="window.initializeQuizShell(4)" class="w-full bg-brand-orange text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all mb-4">Analyze My Child’s Fitment Board →</button>
-            <p class="text-sm text-slate-500 italic text-center px-4 leading-relaxed">Note: Upon completion, your inputs will generate your Smart Parent Pro Dashboard. Based on your unique data, our engine will recommend the optimal analysis path—ranging from Behavioral Fitment to the comprehensive Institutional Alignment Matrix</p>
+            <button onclick="window.phase0Complete=true; window.initializeQuizShell(4);" class="w-full bg-brand-orange text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all mb-4">
+                Analyze My Child’s Fitment Board →
+            </button>
+            <p class="text-sm text-slate-500 italic text-center px-4 leading-relaxed">
+                Note: Upon completion, your inputs will generate your Smart Parent Pro Dashboard. Based on your unique data, our engine will recommend the optimal analysis path—ranging from Behavioral Fitment to the comprehensive Institutional Alignment Matrix
+            </p>
         </div>`;
 };
 
 // --- DATA ---
-let currentQuestion = 0;
-let answers = {};
-let customerData = { childAge: '5-10' };
-let isSyncMatchMode = false;
-
 const questions = [
     { id: "p0_q1", text: "How does your child process complex new data?", options: ["Visual/Charts", "Auditory/Discussion", "Kinesthetic/Build"] },
     { id: "p0_q2", text: "Under high-stakes evaluation, what is the default response?", options: ["The Thriver/Speed", "The Deep Thinker/Precision", "The Collaborative"] },
@@ -157,9 +168,10 @@ const questions = [
     { id: "q11", text: "How important are Sports & Arts?", options: ["Very High - Equal to academics.", "Moderate - Good for hobbies.", "Low - Academics come first."] }
 ];
 
-// --- FALLBACK ---
+// Global Catch
 document.addEventListener('click', function(e) {
     if (e.target.innerText && e.target.innerText.includes('Start Learning Fitment Analysis')) {
+        console.log("Fallback: Initializing Phase 0...");
         window.initializeQuizShell(0);
     }
 });
