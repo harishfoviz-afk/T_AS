@@ -13,7 +13,7 @@ window.hideAllSections = function hideAllSections() {
 
 window.initializeQuizShell = function initializeQuizShell(index) {
     console.log("Initializing Quiz Shell for index:", index);
-    window.hideAllSections();
+    document.getElementById("landingPage").style.display = "none"; window.hideAllSections();
     const container = document.getElementById('questionPages');
     if (container) {
         container.classList.remove('hidden');
@@ -442,3 +442,20 @@ window.transitionToPhase1 = function transitionToPhase1() {
 }
 
 // ... all other functions should be here and attached to window if needed ...
+
+// Plan B: Direct DOM Listener and Robust Initialization
+document.addEventListener('click', function(e) {
+    if (e.target.innerText && e.target.innerText.includes('Start Learning Fitment Analysis')) {
+        console.log("Direct DOM Listener: Button detected and clicked.");
+        if (typeof window.initializeQuizShell === 'function') {
+            window.initializeQuizShell(0);
+        } else {
+            console.error("Plan B: window.initializeQuizShell is still missing.");
+        }
+    }
+});
+
+// Final cleanup and export
+window.scrollToPhase0 = function() {
+    window.initializeQuizShell(0);
+};

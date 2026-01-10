@@ -75,7 +75,7 @@ body {
 
 /* UI FOR QUESTION PAGE */
 .question-page { display: none; min-height: 100vh; background: #fff; padding: 0; flex-direction: column; }
-.active { display: flex !important; }
+.active { display: flex !important; visibility: visible !important; opacity: 1 !important; }
 
 .question-content-wrapper { flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; width: 100%; }
 
@@ -128,7 +128,7 @@ body {
 
 /* Modal & Spinner */
 .payment-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.8); justify-content: center; align-items: center; z-index: 1000; }
-.payment-modal.active { display: flex !important; }
+.payment-modal.active { display: flex !important; visibility: visible !important; opacity: 1 !important; }
 .payment-modal-content { background: white; padding: 40px; border-radius: 16px; text-align: center; width: 90%; max-width: 400px; z-index: 1001; position: relative; }
 
 .spinner { width: 50px; height: 50px; border: 5px solid #f3f3f3; border-top: 5px solid var(--sunrise-primary); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
