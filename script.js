@@ -1,11 +1,10 @@
-// --- STATE MANAGEMENT ---
+// --- GLOBAL BRIDGE ---
 window.phase0Complete = false;
 let currentQuestion = 0;
 let answers = {};
 let customerData = { orderId: 'N/A', childAge: '5-10' };
 let isSyncMatchMode = false;
 
-// --- GLOBAL BRIDGE ---
 window.hideAllSections = function hideAllSections() {
     const sections = ['landingPage', 'aboutAptSkola', 'pricing', 'invest-in-clarity', 'testimonials', 'educatorPartner', 'contact-and-policies', 'mainFooter', 'detailsPage', 'paymentPageContainer', 'questionPages', 'successPage', 'syncMatchGate', 'syncMatchTransition', 'react-hero-root'];
     sections.forEach(id => {
@@ -48,7 +47,6 @@ window.renderQuestionContent = function renderQuestionContent(index) {
     const quizContent = document.getElementById('dynamicQuizContent');
     if (!quizContent) return;
 
-    // Trigger Histogram only if Phase 0 just finished and we haven't shown it yet
     if (index === 4 && !isSyncMatchMode && !window.phase0Complete) {
         window.showPsychometricHistogram();
         return;
@@ -57,7 +55,6 @@ window.renderQuestionContent = function renderQuestionContent(index) {
     const q = questions[index];
     if(!q) return;
 
-    // Calculate Dynamic UI values for numbering
     const isPhase0 = index < 4;
     const displayTotal = isPhase0 ? 4 : (isSyncMatchMode ? 30 : 15);
     const currentQNum = isPhase0 ? index + 1 : (isSyncMatchMode ? index + 1 : index - 3);
@@ -83,7 +80,7 @@ window.renderQuestionContent = function renderQuestionContent(index) {
         </div>
         <div class="mt-12 text-center">
             <button onclick="window.handlePrev()" class="text-slate-400 font-bold hover:text-brand-navy transition-colors flex items-center justify-center gap-2 mx-auto">
-                BACK TO PREVIOUS
+                ← PREVIOUS QUESTION
             </button>
         </div>`;
 };
@@ -165,7 +162,11 @@ const questions = [
     { id: "q8", text: "Is 'Global Recognition' important to you?", options: ["Yes, it's critical.", "It's important.", "Nice to have.", "Not important."] },
     { id: "q9", text: "Should the school focus heavily on Regional Languages?", options: ["Yes, they must be fluent in the local language.", "Basic functional knowledge is enough.", "No, English is the main focus."] },
     { id: "q10", text: "How does your child react to exams?", options: ["They are competitive and handle pressure well.", "They prefer projects and assignments.", "They get very anxious about tests."] },
-    { id: "q11", text: "How important are Sports & Arts?", options: ["Very High - Equal to academics.", "Moderate - Good for hobbies.", "Low - Academics come first."] }
+    { id: "q11", text: "How important are Sports & Arts?", options: ["Very High - Equal to academics.", "Moderate - Good for hobbies.", "Low - Academics come first."] },
+    { id: "q12", text: "What grade is your child entering?", options: ["Preschool / Kindergarten", "Primary (Grades 1-5)", "Middle (Grades 6-8)", "High School (Grades 9+)"] },
+    { id: "q13", text: "What class size do you prefer?", options: ["Small (Less than 25 kids)", "Standard (25-40 kids)", "Large (40+ kids)"] },
+    { id: "q14", text: "How involved do you want to be in homework?", options: ["High (I will help daily)", "Moderate (Weekly check-ins)", "Low (School should manage it)"] },
+    { id: "q15", text: "Where are you looking for schools?", options: ["Metro City (Delhi, Mumbai, Hyd, etc.)", "Tier-2 City (Jaipur, Vizag, etc.)", "Small Town / Rural Area"] }
 ];
 
 // Global Catch
