@@ -135,9 +135,11 @@ const Hero = () => {
   );
 };
 
-// Render the component
-const container = document.getElementById('react-hero-root');
-if (container) {
-    const root = ReactDOM.createRoot(container);
-    root.render(<Hero />);
-}
+// Render the component on window load to ensure CDNs are ready
+window.addEventListener('load', () => {
+    const container = document.getElementById('react-hero-root');
+    if (container) {
+        const root = ReactDOM.createRoot(container);
+        root.render(<Hero />);
+    }
+});
