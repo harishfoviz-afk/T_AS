@@ -1,40 +1,57 @@
 import re
 
-with open('script_restore.js', 'r') as f:
-    content = f.read()
+with open('script_original.js', 'r') as f:
+    orig_content = f.read()
 
-# 1. Extract Master Data and other config
-# 2. Extract Questions
-# 3. Create Phase 0 and Phase 1 arrays
+# Define Phase 0 and Phase 1 Questions
+p0_questions = """
+const phase0Questions = [
+    { id: "p0_q1", text: "How does your child process complex new data?", options: ["Visual/Charts", "Auditory/Discussion", "Kinesthetic/Build"] },
+    { id: "p0_q2", text: "Under high-stakes evaluation, what is the default response?", options: ["The Thriver/Speed", "The Deep Thinker/Precision", "The Collaborative"] },
+    { id: "p0_q3", text: "What is the ultimate End-State for the child's career?", options: ["Global Explorer/Ivy", "Competitive Edge/National", "The Innovator"] },
+    { id: "p0_q4", text: "Which KPI matters most?", options: ["Academic Mastery/Grades", "Holistic Confidence", "Critical Thinking/Logic"] }
+];
+"""
 
-# For the sake of this task, I'll rewrite the core logic part and keep the large data structures.
+p1_questions = """
+const phase1Questions = [
+    { id: "q1", text: "How does your child learn best?", options: ["By seeing images, videos, and diagrams (Visual)", "By listening to stories and discussions (Auditory)", "By doing experiments and building things (Kinesthetic)", "A mix of everything / Adaptable"] },
+    { id: "q2", text: "What subject does your child naturally enjoy?", options: ["Maths, Logic, and Puzzles", "English, Stories, and Art", "Science, Nature, and asking 'Why?'", "A bit of everything / Balanced"] },
+    { id: "q3", text: "What is the big future goal?", options: ["Crack Indian Exams (IIT-JEE / NEET / UPSC)", "Study Abroad (University in US/UK/Canada)", "Entrepreneurship or Creative Arts", "Not sure yet / Keep options open"] },
+    { id: "q4", text: "What is your comfortable annual budget for school fees?", options: ["Below ₹1 Lakh", "₹1 Lakh - ₹3 Lakhs", "₹3 Lakhs - ₹6 Lakhs", "Above ₹6 Lakhs"] },
+    { id: "q5", text: "Will you be moving cities in the next few years?", options: ["No, we are settled here.", "Yes, likely to move within India.", "Yes, likely to move to another Country.", "Unsure"] },
+    { id: "q6", text: "What teaching style do you prefer?", options: ["Structured: Textbooks and clear syllabus", "Inquiry: Research and self-exploration", "Flexible: Student-led (like Montessori)", "Balanced approach"] },
+    { id: "q7", text: "How much study load can your child handle?", options: ["High Volume (Can memorize lots of details)", "Concept Focus (Understands logic, less memory)", "Practical Focus (Prefers doing over reading)"] },
+    { id: "q8", text: "Is 'Global Recognition' important to you?", options: ["Yes, it's critical.", "It's important.", "Nice to have.", "Not important."] },
+    { id: "q9", text: "Should the school focus heavily on Regional Languages?", options: ["Yes, they must be fluent in the local language.", "Basic functional knowledge is enough.", "No, English is the main focus."] },
+    { id: "q10", text: "How does your child react to exams?", options: ["They are competitive and handle pressure well.", "They prefer projects and assignments.", "They get very anxious about tests."] },
+    { id: "q11", text: "How important are Sports & Arts?", options: ["Very High - Equal to academics.", "Moderate - Good for hobbies.", "Low - Academics come first."] },
+    { id: "q12", text: "What grade is your child entering?", options: ["Preschool / Kindergarten", "Primary (Grades 1-5)", "Middle (Grades 6-8)", "High School (Grades 9+)"] },
+    { id: "q13", text: "What class size do you prefer?", options: ["Small (Less than 25 kids)", "Standard (25-40 kids)", "Large (40+ kids)"] },
+    { id: "q14", text: "How involved do you want to be in homework?", options: ["High (I will help daily)", "Moderate (Weekly check-ins)", "Low (School should manage it)"] },
+    { id: "q15", text: "Where are you looking for schools?", options: ["Metro City (Delhi, Mumbai, Hyd, etc.)", "Tier-2 City (Jaipur, Vizag, etc.)", "Small Town / Rural Area"] }
+];
+"""
 
-funnel_code = """
+funnel_logic = """
 window.phase0Complete = false;
-let currentPhase = 0; // 0 for Phase 0, 1 for Phase 1
+let currentPhase = 0; // 0=Phase0, 1=Phase1
 let currentQuestionIndex = 0;
 
 window.hideAllSections = function() {
     const sections = ['landingPage', 'aboutAptSkola', 'pricing', 'invest-in-clarity', 'testimonials', 'educatorPartner', 'contact-and-policies', 'mainFooter', 'detailsPage', 'paymentPageContainer', 'questionPages', 'successPage', 'syncMatchGate', 'syncMatchTransition', 'react-hero-root'];
     sections.forEach(id => {
         const el = document.getElementById(id);
-        if (el) {
-            el.classList.add('hidden');
-            el.classList.remove('active');
-            el.style.display = 'none';
-        }
+        if (el) { el.classList.add('hidden'); el.classList.remove('active'); el.style.display = 'none'; }
     });
     window.scrollTo({ top: 0, behavior: 'instant' });
 };
 
 window.initializeQuizShell = function(index) {
-    console.log("Initializing Quiz Shell Phase:", currentPhase);
     window.hideAllSections();
     const container = document.getElementById('questionPages');
     if (container) {
-        container.classList.remove('hidden');
-        container.classList.add('active');
-        container.style.display = 'flex';
+        container.classList.remove('hidden'); container.classList.add('active'); container.style.display = 'flex';
         container.innerHTML = `
             <div id="questionPageApp" class="question-page active" style="display: flex !important; flex-direction: column; min-height: 100vh; width: 100%; background: white; position: fixed; top: 0; left: 0; z-index: 9999;">
                 <div class="intermediate-header" onclick="location.reload()" style="background: #0F172A; color: white; padding: 1rem 2rem; cursor: pointer;">
@@ -57,15 +74,8 @@ window.renderQuestionContent = function(index) {
     if (!quizContent) return;
 
     const qList = (currentPhase === 0) ? phase0Questions : phase1Questions;
-    
-    // Check if phase 0 is done
-    if (currentPhase === 0 && index >= qList.length) {
-        window.showPsychometricHistogram();
-        return;
-    }
-    
-    // Check if phase 1 is done
-    if (currentPhase === 1 && index >= qList.length) {
+    if (currentPhase === 0 && index >= qList.length) { window.showPsychometricHistogram(); return; }
+    if (currentPhase === 1 && index >= qList.length) { 
         window.hideAllSections();
         const dPage = document.getElementById('detailsPage');
         if(dPage) { dPage.classList.remove('hidden'); dPage.classList.add('active'); dPage.style.display = 'flex'; }
@@ -75,23 +85,14 @@ window.renderQuestionContent = function(index) {
     const q = qList[index];
     if(!q) return;
 
-    // Progress UI
-    let progressPercent = 0;
-    let progressColor = "bg-slate-400";
-    let phaseLabel = "";
-    
+    let progressPercent = 0; let progressColor = "bg-slate-400"; let phaseLabel = "";
     if (currentPhase === 0) {
-        progressPercent = ((index + 1) / qList.length) * 100;
-        phaseLabel = "Phase 0: DNA Scan";
+        progressPercent = ((index + 1) / 4) * 100; phaseLabel = "Phase 0: DNA Scan";
     } else {
         const qNum = index + 1;
-        if (qNum <= 5) {
-            progressPercent = 33; progressColor = "bg-slate-400"; phaseLabel = "Mapping Learning DNA";
-        } else if (qNum <= 10) {
-            progressPercent = 66; progressColor = "bg-brand-orange"; phaseLabel = "Analyzing Academic Compatibility";
-        } else {
-            progressPercent = 100; progressColor = "bg-brand-orange animate-pulse shadow-[0_0_15px_rgba(255,107,53,0.6)]"; phaseLabel = "Matching for Board";
-        }
+        if (qNum <= 5) { progressPercent = 33; progressColor = "bg-slate-400"; phaseLabel = "Mapping Learning DNA"; }
+        else if (qNum <= 10) { progressPercent = 66; progressColor = "bg-brand-orange"; phaseLabel = "Analyzing Academic Compatibility"; }
+        else { progressPercent = 100; progressColor = "bg-brand-orange animate-pulse shadow-[0_0_15px_rgba(255,107,53,0.6)]"; phaseLabel = "Matching for Board"; }
     }
 
     quizContent.innerHTML = `
@@ -118,18 +119,11 @@ window.renderQuestionContent = function(index) {
         </div>`;
 };
 
-window.handlePrev = function() {
-    if (currentQuestionIndex > 0) {
-        window.renderQuestionContent(currentQuestionIndex - 1);
-    }
-};
+window.handlePrev = function() { if (currentQuestionIndex > 0) window.renderQuestionContent(currentQuestionIndex - 1); };
 
 window.selectOption = function(id, val, idx, el) {
-    answers[id] = val;
-    el.style.borderColor = "#0F172A";
-    setTimeout(() => {
-        window.renderQuestionContent(idx + 1);
-    }, 300);
+    answers[id] = val; el.style.borderColor = "#0F172A";
+    setTimeout(() => window.renderQuestionContent(idx + 1), 300);
 };
 
 window.showPsychometricHistogram = function() {
@@ -152,12 +146,7 @@ window.showPsychometricHistogram = function() {
     const interval = setInterval(() => {
         const indexEl = document.getElementById('compIndex');
         if (indexEl) indexEl.innerText = Math.floor(Math.random() * 30 + 40) + "%";
-        if (++count > 15) {
-            clearInterval(interval);
-            indexEl.innerText = "84%";
-            indexEl.style.color = "#FF6B35";
-            setTimeout(window.showSystemicRiskCard, 1500);
-        }
+        if (++count > 15) { clearInterval(interval); indexEl.innerText = "84%"; indexEl.style.color = "#FF6B35"; setTimeout(window.showSystemicRiskCard, 1500); }
     }, 100);
 };
 
@@ -169,9 +158,7 @@ window.showSystemicRiskCard = function() {
                 <div class="text-red-500 text-5xl mb-6 font-black uppercase">⚠️ RISK</div>
                 <h2 class="text-2xl font-black text-brand-navy mb-4 uppercase">Systemic Risk Detected</h2>
                 <p class="text-slate-600 font-medium mb-8 leading-relaxed">Phase 0 data indicates a significant misalignment between natural cognitive syntax and standardized board expectations.</p>
-                <button onclick="window.showPhase1BridgeCard()" class="w-full bg-red-600 text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all">
-                    RESOLVE & START PHASE 1 →
-                </button>
+                <button onclick="window.showPhase1BridgeCard()" class="w-full bg-red-600 text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all">RESOLVE & START PHASE 1 →</button>
             </div>
         </div>`;
 };
@@ -192,10 +179,7 @@ window.showPhase1BridgeCard = function() {
         </div>`;
 };
 
-window.startPhase1 = function() {
-    currentPhase = 1;
-    window.initializeQuizShell(0);
-};
+window.startPhase1 = function() { currentPhase = 1; window.initializeQuizShell(0); };
 
 window.triggerDNAFinalization = function() {
     window.hideAllSections();
@@ -239,33 +223,17 @@ window.triggerDNAFinalization = function() {
 };
 """
 
-# Extract Phase 0 questions (indices 0-3)
-# Extract Phase 1 questions (indices 4-18)
-# We can find them in the content
+# Assemble script.js
+with open('script.js', 'w') as f:
+    f.write(p0_questions + "\n" + p1_questions + "\n" + funnel_logic + "\n" + orig_content)
 
-# Define them manually for absolute safety as per user request to isolate
-phase0 = content.split('const questions = [')[1].split('];')[0]
-# Split into individual objects
-q_objects = re.findall(r'{[^{}]+{[^{}]+}[^{}]+}|{[^{}]+}', phase0)
+# Correct form submission listener
+with open('script.js', 'r') as f:
+    script_content = f.read()
 
-p0 = q_objects[0:4]
-p1 = q_objects[4:19]
-
-p0_str = "const phase0Questions = [" + ",".join(p0) + "];"
-p1_str = "const phase1Questions = [" + ",".join(p1) + "];"
-
-# Replace original initializeQuizShell and renderQuestionContent and questions array in the content
-new_content = p0_str + "\n" + p1_str + "\n" + funnel_code + content
-
-# Fix the customerForm listener to call DNA Finalization
-new_content = new_content.replace('localStorage.setItem(\'aptskola_last_order_id\', newOrderId);', 'localStorage.setItem(\'aptskola_last_order_id\', newOrderId); window.triggerDNAFinalization();')
-
-# Remove the default trigger to payment container in the form
-# We look for the part that shows paymentPageContainer and remove it
-new_content = re.sub(r'setTimeout\(\(\) => \{[^}]+paymentPageContainer[^}]+\}, 500\);', '', new_content)
-
-# Add click listener
-new_content += "\ndocument.addEventListener('click', function(e) { if (e.target.innerText && e.target.innerText.includes('Start Learning Fitment Analysis')) { window.initializeQuizShell(0); } });"
+script_content = script_content.replace('localStorage.setItem(\'aptskola_last_order_id\', newOrderId);', 'localStorage.setItem(\'aptskola_last_order_id\', newOrderId); window.triggerDNAFinalization();')
+script_content = re.sub(r'setTimeout\(\(\) => \{[^}]+paymentPageContainer[^}]+\}, 500\);', '', script_content)
+script_content += "\ndocument.addEventListener('click', function(e) { if (e.target.innerText && e.target.innerText.includes('Start Learning Fitment Analysis')) { window.initializeQuizShell(0); } });"
 
 with open('script.js', 'w') as f:
-    f.write(new_content)
+    f.write(script_content)

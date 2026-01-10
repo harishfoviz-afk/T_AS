@@ -1,19 +1,47 @@
-// --- GLOBAL UTILITIES & funnel ---
+// --- GLOBAL BRIDGE ---
 window.phase0Complete = false;
-window.hideAllSections = function hideAllSections() {
+let currentPhase = 0; // 0=Phase0, 1=Phase1
+let currentQuestionIndex = 0;
+let answers = {};
+let customerData = { orderId: 'N/A', childAge: '5-10' };
+let isSyncMatchMode = false;
+
+const phase0Questions = [
+    { id: "p0_q1", text: "How does your child process complex new data?", options: ["Visual/Charts", "Auditory/Discussion", "Kinesthetic/Build"] },
+    { id: "p0_q2", text: "Under high-stakes evaluation, what is the default response?", options: ["The Thriver/Speed", "The Deep Thinker/Precision", "The Collaborative"] },
+    { id: "p0_q3", text: "What is the ultimate End-State for the child's career?", options: ["Global Explorer/Ivy", "Competitive Edge/National", "The Innovator"] },
+    { id: "p0_q4", text: "Which KPI matters most?", options: ["Academic Mastery/Grades", "Holistic Confidence", "Critical Thinking/Logic"] }
+];
+
+const phase1Questions = [
+    { id: "q1", text: "How does your child learn best?", options: ["Visual", "Auditory", "Kinesthetic", "Adaptable"] },
+    { id: "q2", text: "What subject does your child naturally enjoy?", options: ["Maths", "English/Art", "Science", "Balanced"] },
+    { id: "q3", text: "What is the big future goal?", options: ["Indian Exams", "Study Abroad", "Entrepreneurship", "Not sure"] },
+    { id: "q4", text: "Annual budget for school fees?", options: ["Below ₹1L", "₹1L - ₹3L", "₹3L - ₹6L", "Above ₹6L"] },
+    { id: "q5", text: "Will you be moving cities?", options: ["No", "Within India", "Abroad", "Unsure"] },
+    { id: "q6", text: "Teaching style preference?", options: ["Structured", "Inquiry", "Flexible", "Balanced"] },
+    { id: "q7", text: "Study load capacity?", options: ["High Volume", "Concept Focus", "Practical Focus"] },
+    { id: "q8", text: "Importance of Global Recognition?", options: ["Critical", "Important", "Nice to have", "Not important"] },
+    { id: "q9", text: "Regional Language focus?", options: ["Fluency", "Functional", "English only"] },
+    { id: "q10", text: "Reaction to exams?", options: ["Competitive", "Project-based", "Anxious"] },
+    { id: "q11", text: "Importance of Sports & Arts?", options: ["Very High", "Moderate", "Low"] },
+    { id: "q12", text: "Grade entering?", options: ["Preschool", "Primary", "Middle", "High School"] },
+    { id: "q13", text: "Class size preference?", options: ["Small", "Standard", "Large"] },
+    { id: "q14", text: "Homework involvement?", options: ["High", "Moderate", "Low"] },
+    { id: "q15", text: "Where are you looking for schools?", options: ["Metro City", "Tier-2 City", "Small Town"] }
+];
+
+window.hideAllSections = function() {
     const sections = ['landingPage', 'aboutAptSkola', 'pricing', 'invest-in-clarity', 'testimonials', 'educatorPartner', 'contact-and-policies', 'mainFooter', 'detailsPage', 'paymentPageContainer', 'questionPages', 'successPage', 'syncMatchGate', 'syncMatchTransition', 'react-hero-root'];
     sections.forEach(id => {
         const el = document.getElementById(id);
-        if (el) {
-            el.classList.add('hidden');
-            el.classList.remove('active');
-            el.style.display = 'none';
-        }
+        if (el) { el.classList.add('hidden'); el.classList.remove('active'); el.style.display = 'none'; }
     });
     window.scrollTo({ top: 0, behavior: 'instant' });
 };
 
-window.initializeQuizShell = function initializeQuizShell(index) {
+window.initializeQuizShell = function(index) {
+    console.log("Initializing Quiz Shell Phase:", currentPhase, "Index:", index);
     window.hideAllSections();
     const container = document.getElementById('questionPages');
     if (container) {
@@ -36,39 +64,37 @@ window.initializeQuizShell = function initializeQuizShell(index) {
     }
 };
 
-window.renderQuestionContent = function renderQuestionContent(index) {
-    currentQuestion = index;
+window.renderQuestionContent = function(index) {
+    currentQuestionIndex = index;
     const quizContent = document.getElementById('dynamicQuizContent');
     if (!quizContent) return;
 
-    if (index === 4 && !isSyncMatchMode && !window.phase0Complete) {
+    const qList = (currentPhase === 0) ? phase0Questions : phase1Questions;
+    
+    if (currentPhase === 0 && index >= qList.length) {
         window.showPsychometricHistogram();
         return;
     }
+    
+    if (currentPhase === 1 && index >= qList.length) {
+        window.hideAllSections();
+        const dPage = document.getElementById('detailsPage');
+        if(dPage) { dPage.classList.remove('hidden'); dPage.classList.add('active'); dPage.style.display = 'flex'; }
+        return;
+    }
 
-    const q = questions[index];
+    const q = qList[index];
     if(!q) return;
 
-    const isPhase0 = index < 4;
-    let progressPercent = 0;
-    let progressColor = "bg-slate-400";
-    let phaseLabel = "Phase 0: DNA Scan";
-    let currentQNum = index + 1;
-    let displayTotal = isPhase0 ? 4 : 15;
-
-    if (isPhase0) {
-        progressPercent = (currentQNum / 4) * 100;
+    let progressPercent = 0; let progressColor = "bg-slate-400"; let phaseLabel = "";
+    if (currentPhase === 0) {
+        progressPercent = ((index + 1) / qList.length) * 100;
+        phaseLabel = "Phase 0: DNA Scan";
     } else {
-        const phase1Idx = index - 3;
-        currentQNum = phase1Idx;
-        displayTotal = 15;
-        if (phase1Idx <= 5) {
-            progressPercent = 33; progressColor = "bg-slate-400"; phaseLabel = "Mapping Learning DNA";
-        } else if (phase1Idx <= 10) {
-            progressPercent = 66; progressColor = "bg-brand-orange"; phaseLabel = "Analyzing Academic Compatibility";
-        } else {
-            progressPercent = 100; progressColor = "bg-brand-orange animate-pulse shadow-[0_0_15px_rgba(255,107,53,0.6)]"; phaseLabel = "Matching for Board";
-        }
+        const qNum = index + 1;
+        if (qNum <= 5) { progressPercent = 33; progressColor = "bg-slate-400"; phaseLabel = "Mapping Learning DNA"; }
+        else if (qNum <= 10) { progressPercent = 66; progressColor = "bg-brand-orange"; phaseLabel = "Analyzing Academic Compatibility"; }
+        else { progressPercent = 100; progressColor = "bg-brand-orange animate-pulse shadow-[0_0_15px_rgba(255,107,53,0.6)]"; phaseLabel = "Matching for Board"; }
     }
 
     quizContent.innerHTML = `
@@ -78,7 +104,7 @@ window.renderQuestionContent = function renderQuestionContent(index) {
             </div>
             <div class="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-widest">
                 <span>${phaseLabel}</span>
-                <span>Question ${currentQNum} / ${displayTotal}</span>
+                <span>Question ${index + 1} / ${qList.length}</span>
             </div>
         </div>
         <div class="question-text text-3xl font-extrabold text-brand-navy mb-10 leading-tight">${q.text}</div>
@@ -96,424 +122,122 @@ window.renderQuestionContent = function renderQuestionContent(index) {
 };
 
 window.handlePrev = function() {
-    if (currentQuestion > 0) window.renderQuestionContent(currentQuestion - 1);
+    if (currentQuestionIndex > 0) window.renderQuestionContent(currentQuestionIndex - 1);
 };
 
-window.selectOption = function selectOption(id, val, idx, el) {
+window.selectOption = function(id, val, idx, el) {
     answers[id] = val;
     el.style.borderColor = "#0F172A";
+    setTimeout(() => window.renderQuestionContent(idx + 1), 300);
+};
+
+window.showPsychometricHistogram = function() {
+    const container = document.getElementById('dynamicQuizContent');
+    container.innerHTML = `
+        <div class="p-8 bg-brand-navy rounded-3xl border border-slate-700 shadow-2xl text-center">
+            <h2 class="text-white text-xl font-bold mb-8 uppercase tracking-widest">Psychometric DNA Snapshot</h2>
+            <div class="space-y-6 mb-10 text-left">
+                ${['Cognitive Synthesis', 'Pressure Threshold', 'Ambition Vector', 'Logic Architecture'].map(label => `
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold text-slate-400"><span>${label}</span><span>ANALYZING...</span></div>
+                        <div class="h-3 bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-brand-orange animate-pulse" style="width: ${Math.random() * 40 + 60}%"></div>
+                        </div>
+                    </div>`).join('')}
+            </div>
+            <div id="compIndex" class="text-6xl font-black text-white animate-flicker">--%</div>
+        </div>`;
+    let count = 0;
+    const interval = setInterval(() => {
+        const indexEl = document.getElementById('compIndex');
+        if (indexEl) indexEl.innerText = Math.floor(Math.random() * 30 + 40) + "%";
+        if (++count > 15) { clearInterval(interval); indexEl.innerText = "84%"; indexEl.style.color = "#FF6B35"; setTimeout(window.showSystemicRiskCard, 1500); }
+    }, 100);
+};
+
+window.showSystemicRiskCard = function() {
+    const container = document.getElementById('dynamicQuizContent');
+    container.innerHTML = `
+        <div class="fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-brand-navy/80 backdrop-blur-sm animate-fade-in">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-lg w-full text-center border-t-8 border-red-500">
+                <div class="text-red-500 text-5xl mb-6 font-black uppercase">⚠️ RISK</div>
+                <h2 class="text-2xl font-black text-brand-navy mb-4 uppercase">Systemic Risk Detected</h2>
+                <p class="text-slate-600 font-medium mb-8 leading-relaxed">Phase 0 data indicates a significant misalignment between natural cognitive syntax and standardized board expectations.</p>
+                <button onclick="window.showPhase1BridgeCard()" class="w-full bg-red-600 text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all">RESOLVE & START PHASE 1 →</button>
+            </div>
+        </div>`;
+};
+
+window.showPhase1BridgeCard = function() {
+    const container = document.getElementById('dynamicQuizContent');
+    container.innerHTML = `
+        <div class="bg-slate-50 border-2 border-brand-orange rounded-3xl p-8 shadow-2xl animate-fade-in-up">
+            <h2 class="text-3xl font-extrabold text-brand-navy mb-6 text-center">Deep-Dive Assessment: Phase 1</h2>
+            <p class="text-lg text-slate-700 mb-8 leading-relaxed text-center">You’ve mastered the basics! Now, it’s time for a precision analysis to unlock your child’s detailed fitment roadmap.</p>
+            <div class="space-y-4 mb-10">
+                <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-200"><div class="text-brand-orange text-2xl font-black">01</div><div class="text-brand-navy font-bold">5-Minute Deep-Dive into Academic DNA</div></div>
+                <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-200"><div class="text-brand-orange text-2xl font-black">02</div><div class="text-brand-navy font-bold">Instant Fitment Score for CBSE, ICSE, and IB</div></div>
+                <div class="flex items-center gap-4 bg-white p-4 rounded-xl border border-slate-200"><div class="text-brand-orange text-2xl font-black">03</div><div class="text-brand-navy font-bold">Actionable Roadmap to a 2040 Global Career</div></div>
+            </div>
+            <button onclick="window.startPhase1()" class="w-full bg-brand-orange text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all mb-4">Analyze My Child’s Fitment Board →</button>
+            <p class="text-sm text-slate-500 italic text-center px-4 leading-relaxed">Note: Upon completion, your inputs will generate your Smart Parent Pro Dashboard. Based on your unique data, our engine will recommend the optimal analysis path—ranging from Behavioral Fitment to the comprehensive Institutional Alignment Matrix</p>
+        </div>`;
+};
+
+window.startPhase1 = function() { currentPhase = 1; window.initializeQuizShell(0); };
+
+window.triggerDNAFinalization = function() {
+    window.hideAllSections();
+    const container = document.getElementById("questionPages");
+    container.classList.remove("hidden"); container.classList.add("active"); container.style.display = "flex";
+    const labels = ["Neural Processing", "Stress Threshold", "Instructional Syntax", "Fiscal Range", "Global Parity"];
+    container.innerHTML = `
+        <div class="min-h-screen w-full bg-brand-navy flex flex-col items-center justify-center p-8 relative overflow-hidden">
+            <div id="finalGlass" class="absolute inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
+                <div class="absolute inset-0 bg-white/10 backdrop-blur-xl"></div>
+                <div class="relative z-50 text-star-yellow animate-pulse"><svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.5 1.1 2.5 2.5V11h.5c.6 0 1 .4 1 1v4c0 .6-.4 1-1 1H9c-.6 0-1-.4-1-1v-4c0-.6.4-1 1-1h.5V9.5C9.5 8.1 10.6 7 12 7zm0 1.5c-.6 0-1 .4-1 1V11h2V9.5c0-.6-.4-1-1-1z"/></svg></div>
+            </div>
+            <div class="max-w-2xl w-full z-10">
+                <h2 id="finalStatus" class="text-white text-sm font-bold uppercase tracking-[0.3em] mb-12 text-center">Cross-referencing Academic DNA with 1,200+ School Frameworks...</h2>
+                <div class="space-y-8">
+                    ${labels.map((l, i) => `<div class="space-y-3"><div class="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest">${l}</div><div class="h-4 bg-slate-800 rounded-full overflow-hidden"><div id="bar-${i}" class="h-full bg-slate-600 liquid-animate transition-all duration-700" style="width: 50%"></div></div></div>`).join('')}
+                </div>
+            </div>
+        </div>`;
+
+    const bars = labels.map((_, i) => document.getElementById(`bar-${i}`));
+    let throbCount = 0;
+    const throbInterval = setInterval(() => {
+        bars.forEach(bar => { bar.style.width = Math.floor(Math.random() * 80 + 10) + "%"; });
+        if (++throbCount > 15) {
+            clearInterval(throbInterval);
+            document.getElementById('finalStatus').innerText = "DNA ALIGNMENT COMPLETE: PROFILE SECURED.";
+            document.getElementById('finalStatus').style.color = "#10B981";
+            bars.forEach((bar, i) => { bar.classList.remove('liquid-animate'); bar.classList.add('vibrant-green'); bar.style.width = [88, 72, 94, 65, 81][i] + "%"; });
+            setTimeout(() => {
+                document.getElementById('finalGlass').style.opacity = "1";
+                setTimeout(() => {
+                    window.hideAllSections();
+                    document.getElementById('pricing').style.display = "block";
+                    document.getElementById('pricing').classList.remove('hidden');
+                    document.getElementById('pricing').scrollIntoView({ behavior: "smooth" });
+                }, 2000);
+            }, 1500);
+        }
+    }, 150);
+};
+
+// Config and other data...
+const RAZORPAY_KEY_ID = "rzp_live_RxHmfgMlTRV3Su";
+const EMAILJS_PUBLIC_KEY = "GJEWFtAL7s231EDrk";
+const EMAILJS_SERVICE_ID = "service_bm56t8v";
+const EMAILJS_TEMPLATE_ID = "template_qze00kx";
+const PACKAGE_PRICES = { 'Essential': 59900, 'Premium': 99900, 'The Smart Parent Pro': 149900 };
+
+// Global fallback listener
+document.addEventListener('click', function(e) {
+    if (e.target.innerText && e.target.innerText.includes('Start Learning Fitment Analysis')) {
+        currentPhase = 0;
+        window.initializeQuizShell(0);
+    }
 });
-
-// --- PIXEL RETARGETING TRIGGER ---
-    if (typeof fbq !== 'undefined') {
-        fbq('track', 'InitiateCheckout', {
-            content_name: selectedPackage,
-            value: selectedPrice,
-            currency: 'INR'
-        });
-    }
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'begin_checkout', {
-            items: [{ item_name: selectedPackage, price: selectedPrice }]
-        });
-    }
-
-    const formData = new FormData(this);
-    formData.append('orderId', newOrderId);
-
-// --- RAZORPAY POPUP METHOD (WITH AUTO-PREFILL) ---
-function testPaymentSuccess() {
-    console.log("Test payment success triggered");
-    
-    // Simulate payment success
-    const orderId = customerData.orderId || 'TEST_' + Date.now();
-    customerData.orderId = orderId;
-    localStorage.setItem(`aptskola_session_${orderId}`, JSON.stringify({
-        answers: answers,
-        customerData: customerData,
-        selectedPackage: selectedPackage,
-        selectedPrice: selectedPrice
-    }));
-    localStorage.setItem('aptskola_last_order_id', orderId);
-    
-    const overlay = document.getElementById('redirectLoadingOverlay');
-    if (overlay) overlay.style.display = 'flex';
-
-    // Generate report instantly
-    console.log("Starting report generation...");
-    renderReportToBrowser().then(() => {
-        console.log("Report rendered successfully, showing success page...");
-        showInstantSuccessPage();
-        if(overlay) {
-            overlay.style.display = 'none';
-            console.log("Overlay hidden");
-        }
-        
-        // Send the email with the report image
-        triggerAutomatedEmail();
-    }).catch((error) => {
-        console.error("Error in report generation:", error);
-        alert("There was an error generating your report. Please contact support with this error: " + error.message);
-        if(overlay) {
-            overlay.style.display = 'none';
-            console.log("Overlay hidden after error");
-        }
-    });
-}
-    
-function redirectToRazorpay() {
-    // For testing: bypass payment and show success page
-    if (window.location.search.includes('test=1')) {
-        console.log("TEST MODE: Bypassing payment");
-        testPaymentSuccess();
-        return;
-    }
-    
-    if (typeof Razorpay === 'undefined') {
-        alert("Payment gateway is still loading. Please refresh the page or check your internet connection.");
-        return;
-    }
-
-    const payButton = document.getElementById('payButton');
-    if (payButton) payButton.innerText = "Opening Secure Checkout...";
-    
-    // 1. Pull the price in Paise (e.g., 59900) from your config
-    const amountInPaise = PACKAGE_PRICES[selectedPackage] || 59900;
-
-    const options = {
-        "key": RAZORPAY_KEY_ID, 
-        "amount": amountInPaise, 
-        "currency": "INR",
-        "name": "Apt Skola",
-        "description": `Payment for ${selectedPackage} Report`,
-        "image": "https://aptskola.com/favicon.png", 
-        
-        // 2. THIS IS THE PREFILL LOGIC: 
-        // It uses the data already entered in your details form.
-        "prefill": {
-            "name": customerData.parentName,
-            "email": customerData.email,
-            "contact": customerData.phone
-        },
-        
-        "handler": function (response) {
-            // SUCCESS: Runs after payment without leaving the page
-            console.log("Payment Successful. ID: " + response.razorpay_payment_id);
-            
-            // Check if we have answers before proceeding
-            if (!answers || Object.keys(answers).length === 0) {
-                console.error("No answers found! Checking localStorage...");
-                const lastOrderId = localStorage.getItem('aptskola_last_order_id');
-                const sessionData = JSON.parse(localStorage.getItem(`aptskola_session_${lastOrderId}`));
-                if (sessionData && sessionData.answers) {
-                    answers = sessionData.answers;
-                    customerData = sessionData.customerData;
-                    selectedPackage = sessionData.selectedPackage;
-                    selectedPrice = sessionData.selectedPrice;
-                    console.log("Loaded answers from localStorage");
-                } else {
-                    alert("Assessment data not found. Please complete the assessment first.");
-                    return;
-                }
-            }
-            
-            // Save payment success state to localStorage
-            const orderId = customerData.orderId || 'ORDER_' + Date.now();
-            customerData.orderId = orderId;
-            localStorage.setItem(`aptskola_session_${orderId}`, JSON.stringify({
-                answers: answers,
-                customerData: customerData,
-                selectedPackage: selectedPackage,
-                selectedPrice: selectedPrice
-            }));
-            localStorage.setItem('aptskola_last_order_id', orderId);
-            
-            const overlay = document.getElementById('redirectLoadingOverlay');
-            if (overlay) overlay.style.display = 'flex';
-            
-            // Generate report instantly
-            console.log("Starting report generation...");
-            renderReportToBrowser().then(() => {
-                console.log("Report rendered successfully, showing success page...");
-                showInstantSuccessPage();
-                if(overlay) {
-                    overlay.style.display = 'none';
-                    console.log("Overlay hidden");
-                }
-                
-                // Send the email with the report image
-                triggerAutomatedEmail();
-            }).catch((error) => {
-                console.error("Error in report generation:", error);
-                alert("There was an error generating your report. Please contact support with this error: " + error.message);
-                if(overlay) {
-                    overlay.style.display = 'none';
-                    console.log("Overlay hidden after error");
-                }
-            });
-        },
-        "theme": { "color": "#FF6B35" },
-        "modal": {
-            "ondismiss": function() {
-                if(payButton) payButton.innerText = `Pay ₹${selectedPrice} via UPI / Card →`;
-            }
-        }
-    };
-
-    const rzp1 = new Razorpay(options);
-    rzp1.open();
-}
-
-async function triggerAutomatedEmail() {
-    console.log("CTO: Generating Branded HTML Report with Tiered Insights...");
-    console.log("Selected package:", selectedPackage, "Selected price:", selectedPrice);
-    
-    const res = calculateFullRecommendation(answers);
-    const recBoard = res.recommended.name;
-    const boardKey = recBoard.toLowerCase().includes('cbse') ? 'cbse' : 
-                     (recBoard.toLowerCase().includes('icse') ? 'icse' : 
-                     (recBoard.toLowerCase().includes('ib') ? 'ib' : 
-                     (recBoard.toLowerCase().includes('cambridge') ? 'Cambridge (IGCSE)' : 'State Board')));
-    
-    const data = MASTER_DATA[boardKey];
-
-    // Build the Branded Header and Basic Info
-    let htmlSummary = `
-        <div style="border: 1px solid #E2E8F0; border-radius: 16px; overflow: hidden; font-family: sans-serif; margin: 20px 0;">
-            <div style="background-color: #0F172A; color: #ffffff; padding: 25px; text-align: center;">
-                <h2 style="margin: 0; font-size: 22px; letter-spacing: 0.5px;">${data.title}</h2>
-                <p style="margin: 8px 0 0; color: #FF6B35; font-weight: 800; font-size: 16px;">
-                    MATCH: ${recBoard} (${res.recommended.percentage}%)
-                </p>
-            </div>
-            <div style="padding: 25px; background-color: #ffffff; color: #334155;">
-                <p style="margin-top: 0;"><strong>Persona:</strong> ${data.persona}</p>
-                <p style="line-height: 1.6;"><strong>Philosophy:</strong> ${data.philosophy}</p>
-    `;
-
-    // ADDED: Premium Insights (₹999 Tier)
-    if (selectedPrice >= 999) {
-        console.log("Adding premium content for price:", selectedPrice);
-        htmlSummary += `
-            <div style="margin-top: 20px; padding: 15px; background-color: #F0FDF4; border-left: 4px solid #10B981; border-radius: 4px;">
-                <h4 style="margin: 0 0 5px 0; color: #166534; font-size: 14px; text-transform: uppercase;">Premium Insights</h4>
-                <p style="margin: 0; color: #334155; font-size: 14px;"><strong>Risk Check:</strong> Look for 'Library Dust' and 'Teacher Turnover' during your campus visit.</p>
-                <p style="margin: 5px 0 0; color: #334155; font-size: 14px;"><strong>Financial:</strong> Budget for a 12% annual fee inflation over 15 years.</p>
-            </div>
-        `;
-    }
-
-    // ADDED: Pro Admission Tips (₹1499 Tier)
-    if (selectedPrice >= 1499) {
-        console.log("Adding pro content for price:", selectedPrice);
-        htmlSummary += `
-            <div style="margin-top: 15px; padding: 15px; background-color: #FFF7ED; border-left: 4px solid #FF6B35; border-radius: 4px;">
-                <h4 style="margin: 0 0 5px 0; color: #9A3412; font-size: 14px; text-transform: uppercase;">Pro Admission Tips</h4>
-                <p style="margin: 0; color: #334155; font-size: 14px;"><strong>Negotiation:</strong> Use the 'Lump Sum Leverage' script to ask for admission fee waivers.</p>
-                <p style="margin: 5px 0 0; color: #334155; font-size: 14px;"><strong>Interview:</strong> Never answer for the child; it is the #1 reason for rejection.</p>
-            </div>
-        `;
-    }
-
-    htmlSummary += `</div></div>`;
-
-	// ADDED: Partnership Invitation (Captured from Educator Partner Section)
-    htmlSummary += `
-        <div style="margin-top: 20px; padding: 15px; border: 1px dashed #CBD5E1; border-radius: 8px; background-color: #F8FAFC; text-align: center;">
-            <h4 style="margin: 0 0 10px 0; color: #0F172A; font-size: 14px;">🤝 Join the Apt Skola Network</h4>
-            <p style="margin: 0; color: #475569; font-size: 13px; line-height: 1.5;">
-                Teachers & Tutors: Earn <strong>₹300</strong> for student referrals and 
-                <strong>₹3,000</strong> per session for school-wide engagement. 
-            </p>
-            <a href="https://aptskola.com/#educatorPartner" style="display: inline-block; margin-top: 10px; color: #FF6B35; font-weight: 700; text-decoration: none; font-size: 13px;">Register as Partner →</a>
-        </div>
-    `;
-
-    try {
-        console.log("Sending email for package:", selectedPackage, "price:", selectedPrice);
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-            user_email: customerData.email,
-            user_name: customerData.parentName,
-            order_id: customerData.orderId,
-            child_name: customerData.childName,
-            report_text_summary: htmlSummary 
-        });
-        console.log("Email sent successfully for order:", customerData.orderId);
-    } catch (e) {
-        console.error("Email dispatch failed for order", customerData.orderId, ":", e);
-    }
-}
-
-function processSyncUpgrade() {
-    const payButton = document.querySelector('#upgradeBlock button');
-    if (payButton) payButton.innerText = "Opening Upgrade...";
-
-    const options = {
-        "key": RAZORPAY_KEY_ID,
-        "amount": 29900, // ₹299 in Paise
-        "currency": "INR",
-        "name": "Apt Skola",
-        "description": "Sync Match Module Upgrade",
-        "prefill": {
-            "name": customerData.parentName,
-            "email": customerData.email,
-            "contact": customerData.phone
-        },
-        "handler": function (response) {
-            // SUCCESS: Runs instantly without redirecting
-            customerData.package = 'Premium';
-            isSyncMatchMode = true; 
-            
-            // Save elevated state
-            localStorage.setItem(`aptskola_session_${customerData.orderId}`, JSON.stringify({ answers, customerData }));
-
-            const upgradeBlock = document.getElementById('upgradeBlock');
-            const startBtn = document.getElementById('startSyncBtn');
-            
-            if(upgradeBlock) upgradeBlock.classList.add('hidden');
-            if(startBtn) {
-                startBtn.classList.remove('hidden');
-                startBtn.innerText = "Access Unlocked! Start Sync Check →";
-                startBtn.style.background = "#10B981";
-            }
-            
-            showSyncTransition();
-        },
-        "theme": { "color": "#FF6B35" }
-    };
-    const rzp1 = new Razorpay(options);
-    rzp1.open();
-}
-
-function closeBonusModalAndShowSuccess() {
-    document.getElementById('bonusModal').classList.remove('active');
-    if (selectedPrice >= 1499) {
-        document.getElementById('forensicSuccessModal').classList.add('active');
-    } else {
-        showInstantSuccessPage();
-    }
-}
-
-function closeForensicModalAndShowSuccess() {
-    document.getElementById('forensicSuccessModal').classList.remove('active');
-    showInstantSuccessPage();
-}
-
-function showInstantSuccessPage() {
-    console.log("showInstantSuccessPage called");
-    const paymentPage = document.getElementById('paymentPageContainer');
-    const successPage = document.getElementById('successPage');
-    console.log("Payment page element:", paymentPage);
-    console.log("Success page element:", successPage);
-    
-    // Add this inside your showInstantSuccessPage function in script.js
-	const successContainer = document.querySelector('.success-container');
-	console.log("Success container:", successContainer);
-	if (successContainer) {
-    const backupNotice = `
-        <div style="background: #FFF7ED; border: 1px solid #FFEDD5; padding: 15px; border-radius: 10px; margin: 20px 0; border-left: 5px solid #F59E0B;">
-            <p style="color: #9A3412; font-weight: 700; font-size: 0.9rem;">
-                💾 PLEASE DOWNLOAD YOUR PDF NOW
-            </p>
-            <p style="color: #C2410C; font-size: 0.8rem; margin-top: 5px;">
-                We have sent a summary to your email, but the full 15-year roadmap is only saved locally on this browser. Download the PDF to keep it forever.
-            </p>
-        </div>
-    `;
-    successContainer.insertAdjacentHTML('afterbegin', backupNotice);
-}	
-    if(paymentPage) {
-        paymentPage.classList.add('hidden');
-        console.log("Payment page hidden");
-    }
-    if(successPage) {
-        successPage.classList.remove('hidden');
-        successPage.classList.add('active');
-        console.log("Success page shown");
-        
-        // Scroll to top to show the success page
-        window.scrollTo({ top: 0, behavior: 'instant' });
-        
-        // Wait a bit for DOM to update, then check for buttons
-    }
-    
-    // 5. BUTTON SAFETY: Force Pricing Buttons to be active
-    const pricingButtons = document.querySelectorAll('#pricing button');
-    pricingButtons.forEach(btn => {
-        btn.style.pointerEvents = 'auto';
-        btn.style.cursor = 'pointer';
-        btn.style.zIndex = '100'; // Ensure they are on top
-    });
-
-    // 6. BUTTON SAFETY: Ensure landing page buttons/links are clickable
-    const landingButtons = document.querySelectorAll('#landingPage button, #landingPage a, .hero-actions button');
-    landingButtons.forEach(el => {
-        try {
-            el.style.pointerEvents = 'auto';
-            el.style.cursor = 'pointer';
-            el.style.zIndex = '80';
-        } catch (e) { /* ignore readonly styles */ }
-    });
-
-    // 7. Ensure redirect/loading overlay doesn't block clicks when hidden
-    const redirectOverlay = document.getElementById('redirectLoadingOverlay');
-    if (redirectOverlay && !redirectOverlay.classList.contains('active')) {
-        redirectOverlay.style.pointerEvents = 'none';
-        redirectOverlay.style.display = 'none';
-        redirectOverlay.style.visibility = 'hidden';
-    }
-
-    // 8. DEFENSIVE: detect any unexpected full-page blockers and make them non-interactive
-    (function unblockCoveringElements() {
-        try {
-            const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
-            const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
-            const candidates = [];
-            const all = Array.from(document.querySelectorAll('body *'));
-            all.forEach(el => {
-                const style = window.getComputedStyle(el);
-                if (style.display === 'none' || style.visibility === 'hidden' || style.pointerEvents === 'none') return;
-                const rect = el.getBoundingClientRect();
-                if (!rect.width || !rect.height) return;
-                const coversWidth = rect.width >= vw * 0.9 && rect.height >= vh * 0.9;
-                const isFixed = style.position === 'fixed' || style.position === 'absolute' || style.position === 'sticky';
-                const z = parseInt(style.zIndex) || 0;
-                if (coversWidth && isFixed && z >= 50) {
-                    candidates.push({ el, rect, z, className: el.className || '', id: el.id || '' });
-                }
-            });
-
-            if (candidates.length > 0) {
-                console.warn('Blocking elements detected:', candidates.map(c => ({id: c.id, class: c.className, z: c.z})));
-                candidates.forEach(c => {
-                    // Preserve intentional modals by checking for common modal classes/ids
-                    const lower = String(c.className).toLowerCase();
-                    const id = String(c.id).toLowerCase();
-                    if (lower.includes('payment-modal') || lower.includes('sample-modal') || id.includes('redirect') || id.includes('modal') || c.el.classList.contains('active')) {
-                        // if it's active modal, leave it; otherwise ensure it's visible and interactive
-                        if (!c.el.classList.contains('active')) {
-                            c.el.style.pointerEvents = 'none';
-                            c.el.style.zIndex = '10';
-                            console.info('Demoted non-active modal-like element:', c.el);
-                        }
-                    } else {
-                        c.el.style.pointerEvents = 'none';
-                        c.el.style.zIndex = '10';
-                        console.info('Disabled unexpected full-page blocker:', c.el);
-                    }
-                });
-            }
-        } catch (e) {
-            console.error('unblockCoveringElements failed', e);
-        }
-    })();
-});
-
-// --- HELPER FUNCTIONS (PASTE & RECOVERY) ---
-async function pasteOrderId() {
-    try {
-        const text = await navigator.clipboard.readText();
-        const syncInput = document.getElementById('syncOrderId');
-        if (syncInput && text) {
-            syncInput.value = text.trim();
-            syncInput.style.borderColor = "#10B981"; 
