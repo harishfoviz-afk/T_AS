@@ -2231,3 +2231,103 @@ function recoverSessionEmail(targetEmail) {
         alert("No assessment found for this email on this device.");
     }
 }document.addEventListener('click', function(e) { if (e.target.innerText && e.target.innerText.includes('Start Learning Fitment Analysis')) { window.initializeQuizShell(0); } });
+
+// --- PHASE 0 UPGRADES ---
+window.showPsychometricHistogram = function() {
+    const container = document.getElementById('dynamicQuizContent');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="p-8 bg-brand-navy rounded-3xl border border-slate-700 shadow-2xl overflow-hidden relative">
+            <h2 class="text-white text-xl font-bold mb-8 uppercase tracking-widest text-center">Psychometric DNA Snapshot</h2>
+            
+            <div class="space-y-6 mb-10">
+                ${['Cognitive Synthesis', 'Pressure Threshold', 'Ambition Vector', 'Logic Architecture'].map(label => `
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-bold text-slate-400 uppercase tracking-tighter">
+                            <span>${label}</span>
+                            <span class="animate-pulse">ANALYZING...</span>
+                        </div>
+                        <div class="h-3 bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-brand-orange animate-pulse-fast shadow-[0_0_15px_rgba(255,107,53,0.5)]" style="width: ${Math.random() * 40 + 60}%"></div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="text-center">
+                <div class="text-xs text-slate-500 uppercase mb-2 tracking-widest">Compatibility Index</div>
+                <div id="compIndex" class="text-6xl font-black text-white animate-flicker">--%</div>
+            </div>
+        </div>`;
+
+    let count = 0;
+    const interval = setInterval(() => {
+        const indexEl = document.getElementById('compIndex');
+        if (indexEl) indexEl.innerText = Math.floor(Math.random() * 30 + 40) + "%";
+        count++;
+        if (count > 15) {
+            clearInterval(interval);
+            indexEl.innerText = "84%";
+            indexEl.classList.remove('animate-flicker', 'text-white');
+            indexEl.classList.add('text-brand-orange');
+            setTimeout(window.showTrajectoryProjection, 1500);
+        }
+    }, 100);
+};
+
+window.showTrajectoryProjection = function() {
+    window.hideAllSections();
+    const bridge = document.getElementById('questionPages');
+    bridge.classList.remove('hidden');
+    bridge.innerHTML = `
+        <div class="min-h-screen bg-brand-navy flex flex-col items-center justify-center p-4">
+            <h2 class="text-slate-400 uppercase tracking-[0.3em] text-sm mb-12 animate-pulse">Running Trajectory Simulation</h2>
+            
+            <div class="relative w-full max-w-2xl aspect-video bg-slate-900/50 rounded-2xl border border-slate-800 p-8">
+                <svg viewBox="0 0 400 200" class="w-full h-full overflow-visible">
+                    <!-- Grid Lines -->
+                    <line x1="0" y1="180" x2="400" y2="180" stroke="#1e293b" stroke-width="1" />
+                    <line x1="20" y1="0" x2="20" y2="200" stroke="#1e293b" stroke-width="1" />
+
+                    <!-- CBSE Path -->
+                    <path d="M 20 180 L 220 100" fill="none" stroke="#a855f7" stroke-width="3" class="path-draw neon-purple" />
+                    <circle cx="220" cy="100" r="4" fill="#ef4444" class="animate-ping" />
+                    <text x="230" y="105" fill="#ef4444" font-size="10" font-weight="bold" class="animate-shake">TRUNCATED</text>
+
+                    <!-- ICSE Path -->
+                    <path d="M 20 180 Q 150 50 300 120" fill="none" stroke="#eab308" stroke-width="3" class="path-draw neon-gold" />
+                    <text x="310" y="130" fill="#eab308" font-size="10" class="animate-pulse">SYSTEMIC BARRIER</text>
+
+                    <!-- IB Path -->
+                    <path d="M 20 180 C 100 150 200 20 380 40" fill="none" stroke="#06b6d4" stroke-width="3" class="path-draw neon-cyan" />
+                </svg>
+            </div>
+
+            <div id="recalCard" class="mt-12 opacity-0 transition-opacity duration-1000">
+                <div class="bg-brand-orange/10 border border-brand-orange/30 p-8 rounded-3xl text-center max-w-md">
+                    <h3 class="text-white text-2xl font-bold mb-4">RECALIBRATION REQUIRED</h3>
+                    <p class="text-slate-400 mb-8 leading-relaxed">Phase 0 data indicates high volatility in the current path. We must establish a custom fitment roadmap.</p>
+                    <button onclick="window.initializeQuizShell(4)" class="bg-brand-orange text-white px-8 py-4 rounded-full font-extrabold shadow-2xl hover:scale-105 transition-all">
+                        START PHASE 1 ASSESSMENT →
+                    </button>
+                </div>
+            </div>
+        </div>`;
+
+    setTimeout(() => {
+        document.getElementById('recalCard').style.opacity = '1';
+        document.body.classList.add('animate-shake');
+        setTimeout(() => document.body.classList.remove('animate-shake'), 1000);
+    }, 3500);
+};
+
+// --- UPDATED RENDER LOGIC ---
+const originalRender = window.renderQuestionContent;
+window.renderQuestionContent = function(index) {
+    if (index === 4 && !isSyncMatchMode) {
+        window.showPsychometricHistogram();
+        return;
+    }
+    originalRender(index);
+};
