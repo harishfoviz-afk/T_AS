@@ -1,49 +1,3 @@
-window.hideAllSections = function hideAllSections() {
-    const sections = ["landingPage", "aboutAptSkola", "pricing", "invest-in-clarity", "testimonials", "educatorPartner", "contact-and-policies", "mainFooter", "detailsPage", "paymentPageContainer", "questionPages", "successPage", "syncMatchGate", "syncMatchTransition", "react-hero-root"];
-    sections.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) {
-            el.classList.add("hidden");
-            el.classList.remove("active");
-            el.style.display = "none";
-        }
-    });
-    window.scrollTo({ top: 0, behavior: "instant" });
-};
-
-window.initializeQuizShell = function initializeQuizShell(index) {
-    console.log("Global: Initializing Quiz Shell...");
-    const landing = document.getElementById("landingPage");
-    if (landing) landing.style.display = "none";
-    const reactRoot = document.getElementById("react-hero-root");
-    if (reactRoot) reactRoot.style.display = "none";
-    
-    window.hideAllSections();
-    
-    const container = document.getElementById("questionPages");
-    if (container) {
-        container.classList.remove("hidden");
-        container.classList.add("active");
-        container.style.display = "flex";
-        container.innerHTML = `
-            <div id="questionPageApp" class="question-page active" style="display: flex !important; flex-direction: column; min-height: 100vh; width: 100%; background: white; position: fixed; top: 0; left: 0; z-index: 9999;">
-                <div class="intermediate-header" onclick="location.reload()" style="background: #0F172A; color: white; padding: 1rem 2rem; cursor: pointer;">
-                    <span class="font-bold text-xl">Apt <span style="color: #FF6B35;">Skola</span></span>
-                </div>
-                <div class="question-content-wrapper" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 20px;">
-                    <div id="dynamicQuizContent" class="question-container" style="max-width: 750px; width: 100%;"></div>
-                </div>
-                <div class="intermediate-footer" style="background: #0F172A; color: #CBD5E1; padding: 1.5rem; text-align: center; font-size: 0.85rem;">
-                    © 2026 Apt Skola
-                </div>
-            </div>`;
-        if (typeof renderQuestionContent === "function") {
-            renderQuestionContent(index);
-        } else {
-             console.error("renderQuestionContent is missing!");
-        }
-    }
-};
 // --- FORCE DOMAIN CONSISTENCY ---
 if (location.hostname !== 'localhost' && location.hostname === 'www.aptskola.com') {
     location.replace(location.href.replace('www.', ''));
@@ -2230,4 +2184,4 @@ function recoverSessionEmail(targetEmail) {
     } else {
         alert("No assessment found for this email on this device.");
     }
-}document.addEventListener('click', function(e) { if (e.target.innerText && e.target.innerText.includes('Start Learning Fitment Analysis')) { window.initializeQuizShell(0); } });
+}
