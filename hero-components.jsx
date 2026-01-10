@@ -84,15 +84,13 @@ const MagneticButton = () => {
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
         onClick={() => {
-          if (typeof window.scrollToPhase0 === 'function') {
-            window.scrollToPhase0();
-          } else if (typeof window.initializeQuizShell === 'function') {
+          if (typeof window.initializeQuizShell === 'function') {
             window.initializeQuizShell(0);
           }
         }}
-        className="btn-fill-hover bg-transparent text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl hover:shadow-orange-500/40 transition-all border-2 border-brand-orange"
+        className="bg-brand-orange text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl hover:shadow-orange-500/40 transition-all border-2 border-brand-orange"
       >
-        Start Learning Fitment Analysis <span className="animate-pulse">→</span>
+        Start Learning Fitment Analysis <span className="blink-arrow-bold">→</span>
       </motion.button>
     </div>
   );

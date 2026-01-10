@@ -103,7 +103,6 @@
     <script>window.process = { env: { NODE_ENV: "production" } };</script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/framer-motion@10.16.4/dist/framer-motion.js"></script>
 
     <script type="application/ld+json">
@@ -534,7 +533,7 @@
 
                 <div style="margin-top: 30px; border-radius: 16px; overflow: hidden; border: 1px solid #BAE6FC; background: #F0F9FF; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);">
                     <div style="width: 100%; line-height: 0;">
-                        <img src="Foviz Ad.jpg" alt="2040 Career Roadmap" style="width: 100%; height: auto; display: block;">
+                        <img src="Foviz Ad.jpg" loading="lazy" alt="2040 Career Roadmap" style="width: 100%; height: auto; display: block;">
                     </div>
                     
                     <div style="padding: 20px; text-align: left;">
@@ -734,7 +733,7 @@
             
             <div class="report-card" style="padding: 0; overflow: hidden; border: 2px solid var(--sunrise-primary); margin-bottom: 25px;">
                 <div style="position: relative;">
-                    <img src="Foviz Ad.jpg" style="width: 100%; height: auto; display: block; filter: brightness(0.85);">
+                    <img src="Foviz Ad.jpg" loading="lazy" style="width: 100%; height: auto; display: block; filter: brightness(0.85);">
                     <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(transparent, rgba(15, 23, 42, 0.9)); color: white; text-align: left;">
                         <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800;">Step 2: The 2040 Career GPS</h3>
                         <p style="margin: 5px 0 0; font-size: 0.85rem; opacity: 0.9;">Map the journey from today's Board to tomorrow's Ivy League.</p>
@@ -819,5 +818,6 @@
 
     <script type="text/babel" src="hero-components.jsx"></script>
     <script src="script.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </body>
 </html>

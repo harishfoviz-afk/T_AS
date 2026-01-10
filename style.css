@@ -311,3 +311,16 @@ footer .policy-links a { margin: 0 8px; color: #CBD5E1; text-decoration: none; f
 .brand-badge-text span {
     font-size: 3rem;
 }
+
+/* GitHub Performance and Blinking Fix */
+@keyframes fastBlink { 
+    0%, 100% { opacity: 1; } 
+    50% { opacity: 0; } 
+}
+
+.blink-arrow-bold { 
+    font-weight: 900 !important; 
+    display: inline-block; 
+    animation: fastBlink 0.8s infinite; 
+    margin-left: 8px; 
+}
