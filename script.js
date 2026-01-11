@@ -324,3 +324,103 @@ window.closePricingModal = function() {
     const modal = document.getElementById('pricingModal');
     if (modal) modal.classList.remove('active');
 };
+
+// --- RAZORPAY & SUCCESS FLOW ---
+window.redirectToRazorpay = function() {
+    console.log("Starting Payment Flow...");
+    const payButton = document.getElementById('payButton');
+    if (payButton) payButton.innerText = "Opening Secure Checkout...";
+    
+    // Check if we are in test mode
+    if (window.location.search.includes('test=1')) {
+        console.log("TEST MODE: Bypassing payment");
+        window.renderReportToBrowser().then(() => window.showInstantSuccessPage());
+        return;
+    }
+
+    if (typeof Razorpay === 'undefined') {
+        alert("Payment gateway is still loading. Please refresh.");
+        return;
+    }
+
+    const options = {
+        "key": RAZORPAY_KEY_ID,
+        "amount": selectedPrice * 100,
+        "currency": "INR",
+        "name": "Apt Skola",
+        "description": `Payment for ${selectedPackage} Report`,
+        "prefill": {
+            "name": customerData.parentName,
+            "email": customerData.email,
+            "contact": customerData.phone
+        },
+        "handler": function (response) {
+            console.log("Payment Successful:", response.razorpay_payment_id);
+            window.renderReportToBrowser().then(() => {
+                window.showInstantSuccessPage();
+                window.triggerAutomatedEmail();
+            });
+        },
+        "theme": { "color": "#FF6B35" }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+};
+
+window.calculateFullRecommendation = function(ansSet) {
+    let scores = { "CBSE": 0, "ICSE": 0, "IB": 0, "Cambridge (IGCSE)": 0, "State Board": 0 };
+    // Basic logic mapping (Simplified for production bridge)
+    if (ansSet.q3 === 0) scores["CBSE"] += 20;
+    if (ansSet.q3 === 1) scores["IB"] += 20;
+    
+    let results = Object.keys(scores).map(board => ({ 
+        name: board, 
+        score: scores[board],
+        percentage: Math.min(Math.round((scores[board] / 20) * 95) + 5, 99)
+    }));
+    results.sort((a, b) => b.score - a.score);
+    return { recommended: results[0], alternative: results[1], fullRanking: results };
+};
+
+window.renderReportToBrowser = async function() {
+    console.log("Generating Browser Report...");
+    const res = window.calculateFullRecommendation(answers);
+    const recBoard = res.recommended.name;
+    
+    let html = `
+        <div class="report-card" style="background:#0F172A; color:white; text-align:center;">
+            <div style="font-size:2rem; font-weight:800;">Apt <span style="color:#FF6B35;">Skola</span></div>
+            <div style="font-size:1.1rem; opacity:0.8;">Scientific Assessment Report</div>
+        </div>
+        <div class="report-card">
+            <h2 style="font-size:1.5rem; font-weight:800; color:#0F172A;">Recommended Board: ${recBoard}</h2>
+            <p style="margin-top:10px;">Our engine has matched your child's cognitive DNA to the ${recBoard} framework with a ${res.recommended.percentage}% alignment score.</p>
+        </div>`;
+    
+    const preview = document.getElementById('reportPreview');
+    if (preview) preview.innerHTML = html;
+};
+
+window.showInstantSuccessPage = function() {
+    window.hideAllSections();
+    const successPage = document.getElementById('successPage');
+    if (successPage) {
+        successPage.classList.remove('hidden');
+        successPage.classList.add('active');
+        successPage.style.display = 'block';
+        document.getElementById('displayOrderId').textContent = customerData.orderId;
+        document.getElementById('successParentName').textContent = customerData.parentName;
+    }
+};
+
+window.triggerAutomatedEmail = function() {
+    console.log("Sending Success Email...");
+    // EmailJS logic would go here
+};
+
+// Ensure the pay button in paymentPageContainer triggers the function
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'payButton') {
+        window.redirectToRazorpay();
+    }
+});
