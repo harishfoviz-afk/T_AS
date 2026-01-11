@@ -286,3 +286,41 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Helper for location.reload() consistency
 window.goToLandingPage = function() { location.reload(); };
+
+// --- PRICING & PAYMENT GATEWAY ---
+window.selectPackage = function(pkg, price) {
+    console.log("Package selected:", pkg, price);
+    selectedPackage = pkg;
+    selectedPrice = price;
+
+    // Check for session data
+    const lastOrderId = localStorage.getItem('aptskola_last_order_id');
+    const sessionData = JSON.parse(localStorage.getItem(`aptskola_session_${lastOrderId}`));
+    
+    if (sessionData) {
+        // Prepare Payment Summary
+        window.hideAllSections();
+        const pCont = document.getElementById('paymentPageContainer');
+        if(pCont) {
+            pCont.classList.remove('hidden');
+            pCont.classList.add('active');
+            pCont.style.display = 'flex';
+            
+            document.getElementById('summaryPackage').textContent = pkg;
+            document.getElementById('summaryPrice').textContent = `₹${price}`;
+            document.getElementById('summaryTotal').textContent = `₹${price}`;
+            
+            // Re-render Razorpay link logic if needed
+            const payBtn = document.getElementById('payButton');
+            if(payBtn) payBtn.innerText = `Pay ₹${price} via UPI / Card / Netbanking →`;
+        }
+    } else {
+        alert("Session expired. Please restart the analysis.");
+        window.goToLandingPage();
+    }
+};
+
+window.closePricingModal = function() {
+    const modal = document.getElementById('pricingModal');
+    if (modal) modal.classList.remove('active');
+};
