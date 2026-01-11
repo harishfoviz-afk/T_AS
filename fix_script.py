@@ -1,16 +1,34 @@
 import re
 
 with open('script.js', 'r') as f:
-    orig = f.read()
+    content = f.read()
 
-# Core Funnel Implementation with the missing MASTER_DATA access fix
-funnel = """
-window.phase0Complete = false;
-let currentPhase = 0; 
-let currentQuestionIndex = 0;
-let answers = {};
-let customerData = { orderId: 'N/A', childAge: '5-10', parentName: '', childName: '', email: '', phone: '' };
+# 1. Ensure redirectToRazorpay is robust
+# Check if selectedPackage is correctly passed to PACKAGE_PRICES
+# Fix: The price in the summary is numeric (e.g. 599), but PACKAGE_PRICES uses pkg name.
 
+# 2. Fix the button name logic in script.js if it's set dynamically
+content = content.replace('document.getElementById("submitBtn").innerText = "Proceed to Payment →";', 
+                          'document.getElementById("submitBtn").innerText = "Unlock Behavioral Alignment →";')
+
+# 3. Ensure renderReportToBrowser has the full logic (archetypes, match percentage, master data)
+# The user complained it's not rendering. This usually means MASTER_DATA is missing or incorrect.
+
+# Let's verify MASTER_DATA is present in script.js
+if 'const MASTER_DATA' not in content:
+    # If missing, we need to restore it from script_original.js or provide a full version
+    print("MASTER_DATA missing, restoring...")
+
+# Re-construction of a clean script.js that combines the funnel and the original logic
+with open('script_original.js', 'r') as f:
+    original = f.read()
+
+# Extract MASTER_DATA and questions from script_original
+master_data_match = re.search(r'const MASTER_DATA = \{.*?\};', original, re.DOTALL)
+master_data = master_data_match.group(0) if master_data_match else ""
+
+# We'll use the isolated questions we defined earlier
+questions_code = """
 const phase0Questions = [
     { id: "p0_q1", text: "How does your child process complex new data?", options: ["Visual/Charts", "Auditory/Discussion", "Kinesthetic/Build"] },
     { id: "p0_q2", text: "Under high-stakes evaluation, what is the default response?", options: ["The Thriver/Speed", "The Deep Thinker/Precision", "The Collaborative"] },
@@ -35,7 +53,22 @@ const phase1Questions = [
     { id: "q14", text: "Homework involvement?", options: ["High", "Moderate", "Low"] },
     { id: "q15", text: "Where are you looking for schools?", options: ["Metro City", "Tier-2 City", "Small Town"] }
 ];
+"""
 
+# Re-build script.js
+funnel_start = """
+window.phase0Complete = false;
+let currentPhase = 0; 
+let currentQuestionIndex = 0;
+let answers = {};
+let customerData = { orderId: 'N/A', childAge: '5-10', parentName: '', childName: '', email: '', phone: '' };
+let selectedPackage = 'Essential';
+let selectedPrice = 599;
+
+"""
+
+# Include all the visual/funnel functions
+funnel_functions = """
 window.hideAllSections = function() {
     const sections = ['landingPage', 'aboutAptSkola', 'pricing', 'invest-in-clarity', 'testimonials', 'educatorPartner', 'contact-and-policies', 'mainFooter', 'detailsPage', 'paymentPageContainer', 'questionPages', 'successPage', 'syncMatchGate', 'syncMatchTransition', 'react-hero-root'];
     sections.forEach(id => {
@@ -72,7 +105,6 @@ window.renderQuestionContent = function(index) {
     currentQuestionIndex = index;
     const quizContent = document.getElementById('dynamicQuizContent');
     if (!quizContent) return;
-
     const qList = (currentPhase === 0) ? phase0Questions : phase1Questions;
     if (currentPhase === 0 && index >= qList.length) { window.showPsychometricHistogram(); return; }
     if (currentPhase === 1 && index >= qList.length) { 
@@ -81,10 +113,8 @@ window.renderQuestionContent = function(index) {
         if(dPage) { dPage.classList.remove('hidden'); dPage.classList.add('active'); dPage.style.display = 'flex'; }
         return;
     }
-
     const q = qList[index];
     if(!q) return;
-
     let progressPercent = 0; let progressColor = "bg-slate-400"; let phaseLabel = "";
     if (currentPhase === 0) {
         progressPercent = ((index + 1) / 4) * 100; phaseLabel = "Phase 0: DNA Scan";
@@ -94,7 +124,6 @@ window.renderQuestionContent = function(index) {
         else if (qNum <= 10) { progressPercent = 66; progressColor = "bg-brand-orange"; phaseLabel = "Analyzing Academic Compatibility"; }
         else { progressPercent = 100; progressColor = "bg-brand-orange animate-pulse shadow-[0_0_15px_rgba(255,107,53,0.6)]"; phaseLabel = "Matching for Board"; }
     }
-
     quizContent.innerHTML = `
         <div class="progress-container mb-10">
             <div class="progress-track h-2 bg-slate-100 rounded-full overflow-hidden mb-4">
@@ -120,11 +149,7 @@ window.renderQuestionContent = function(index) {
 };
 
 window.handlePrev = function() { if (currentQuestionIndex > 0) window.renderQuestionContent(currentQuestionIndex - 1); };
-
-window.selectOption = function(id, val, idx, el) {
-    answers[id] = val; el.style.borderColor = "#0F172A";
-    setTimeout(() => window.renderQuestionContent(idx + 1), 300);
-};
+window.selectOption = function(id, val, idx, el) { answers[id] = val; el.style.borderColor = "#0F172A"; setTimeout(() => window.renderQuestionContent(idx + 1), 300); };
 
 window.showPsychometricHistogram = function() {
     const container = document.getElementById('dynamicQuizContent');
@@ -195,7 +220,7 @@ window.triggerDNAFinalization = function() {
             <div class="max-w-2xl w-full z-10">
                 <h2 id="finalStatus" class="text-white text-sm font-bold uppercase tracking-[0.3em] mb-12 text-center">Cross-referencing Academic DNA with 1,200+ School Frameworks...</h2>
                 <div class="space-y-8">
-                    ${labels.map((l, i) => `<div class="space-y-3"><div class="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest">\${l}</div><div class="h-4 bg-slate-800 rounded-full overflow-hidden"><div id="bar-\${i}" class="h-full bg-slate-600 liquid-animate transition-all duration-700" style="width: 50%"></div></div></div>`).join('')}
+                    ${labels.map((l, i) => `<div class="space-y-3"><div class="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest">${l}</div><div class="h-4 bg-slate-800 rounded-full overflow-hidden"><div id="bar-${i}" class="h-full bg-slate-600 liquid-animate transition-all duration-700" style="width: 50%"></div></div></div>`).join('')}
                 </div>
             </div>
         </div>`;
@@ -219,10 +244,57 @@ window.triggerDNAFinalization = function() {
                         pricing.classList.remove('hidden');
                         pricing.scrollIntoView({ behavior: "smooth" });
                     }
-                }, 5000);
+                }, 5000); 
             }, 1500);
         }
     }, 150);
+};
+
+window.selectPackage = function(pkg, price) {
+    selectedPackage = pkg;
+    selectedPrice = price;
+    window.hideAllSections();
+    const pCont = document.getElementById('paymentPageContainer');
+    if(pCont) {
+        pCont.classList.remove('hidden');
+        pCont.classList.add('active');
+        pCont.style.display = 'flex';
+        document.getElementById('summaryPackage').textContent = pkg;
+        document.getElementById('summaryPrice').textContent = `₹${price}`;
+        document.getElementById('summaryTotal').textContent = `₹${price}`;
+        const payBtn = document.getElementById('payButton');
+        if(payBtn) payBtn.innerText = `Pay ₹${price} via UPI / Card / Netbanking →`;
+    }
+};
+
+window.redirectToRazorpay = function() {
+    const payButton = document.getElementById('payButton');
+    if (payButton) payButton.innerText = "Opening Secure Checkout...";
+    if (window.location.search.includes('test=1')) {
+        window.renderReportToBrowser().then(() => window.showInstantSuccessPage());
+        return;
+    }
+    if (typeof Razorpay === 'undefined') {
+        alert("Payment gateway is still loading.");
+        return;
+    }
+    const options = {
+        "key": "rzp_live_RxHmfgMlTRV3Su",
+        "amount": selectedPrice * 100,
+        "currency": "INR",
+        "name": "Apt Skola",
+        "description": `Payment for ${selectedPackage} Report`,
+        "prefill": { "name": customerData.parentName, "email": customerData.email, "contact": customerData.phone },
+        "handler": function (response) {
+            window.renderReportToBrowser().then(() => {
+                window.showInstantSuccessPage();
+                // triggerAutomatedEmail logic...
+            });
+        },
+        "theme": { "color": "#FF6B35" }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
 };
 
 window.calculateFullRecommendation = function(ansSet) {
@@ -231,79 +303,89 @@ window.calculateFullRecommendation = function(ansSet) {
     if (ansSet.q3 === 1) scores["IB"] += 15;
     if (ansSet.q6 === 0) scores["CBSE"] += 10;
     if (ansSet.q6 === 1) scores["IB"] += 10;
-    
-    let results = Object.keys(scores).map(board => {
-        const boardKey = board.toLowerCase().includes('cbse') ? 'cbse' : (board.toLowerCase().includes('icse') ? 'icse' : (board.toLowerCase().includes('ib') ? 'ib' : (board.toLowerCase().includes('cambridge') ? 'Cambridge (IGCSE)' : 'State Board')));
-        return { name: board, score: scores[board], percentage: Math.min(Math.round((scores[board] / 25) * 95) + 5, 99), key: boardKey };
-    });
+    let results = Object.keys(scores).map(board => ({ 
+        name: board, 
+        score: scores[board],
+        percentage: Math.min(Math.round((scores[board] / 25) * 95) + 5, 99)
+    }));
     results.sort((a, b) => b.score - a.score);
     return { recommended: results[0], alternative: results[1], fullRanking: results };
 };
 
 window.renderReportToBrowser = async function() {
-    console.log("Rendering report...");
     const res = window.calculateFullRecommendation(answers);
     const recBoard = res.recommended.name;
-    const data = MASTER_DATA[res.recommended.key] || MASTER_DATA['cbse'];
+    // Map board to master data
+    const boardKey = recBoard.toLowerCase().includes('cbse') ? 'cbse' : 
+                     (recBoard.toLowerCase().includes('icse') ? 'icse' : 
+                     (recBoard.toLowerCase().includes('ib') ? 'ib' : 
+                     (recBoard.toLowerCase().includes('cambridge') ? 'Cambridge (IGCSE)' : 'State Board')));
+    const data = MASTER_DATA[boardKey] || { title: "Archtype", persona: "Persona", philosophy: "Philosophy" };
     
     let html = `
         <div id="pdf-header" class="report-card" style="background:#0F172A; color:white; text-align:center;">
             <div style="font-size:2rem; font-weight:800;">Apt <span style="color:#FF6B35;">Skola</span></div>
-            <div style="font-size:1.1rem; opacity:0.8;">Report ID: \${customerData.orderId}</div>
+            <div style="font-size:1.1rem; opacity:0.8;">\${selectedPackage} Report</div>
+            <div style="font-size:0.85rem; margin-top:10px;">ID: \${customerData.orderId} | Prepared for: \${customerData.childName}</div>
         </div>
         <div class="report-card">
-            <div class="report-header-bg">RECOMMENDED ARCHETYPE</div>
+            <div class="report-header-bg">THE RECOMMENDED ARCHETYPE</div>
             <div style="font-size:1.8rem; font-weight:800; color:#0F172A;">\${data.title}</div>
             <div style="margin-top:10px; padding:10px; background:#F8FAFC; border-radius:8px; display:inline-block;">
                 Board Match: <span style="color:#FF6B35; font-weight:bold;">\${recBoard} (\${res.recommended.percentage}%)</span>
             </div>
         </div>`;
     const preview = document.getElementById('reportPreview');
-    if (preview) preview.innerHTML = html;
+    if (preview) { preview.innerHTML = html; preview.classList.remove('off-screen-render'); }
 };
 
-window.selectPackage = function(pkg, price) {
-    selectedPackage = pkg; selectedPrice = price;
+window.showInstantSuccessPage = function() {
     window.hideAllSections();
-    const pCont = document.getElementById('paymentPageContainer');
-    if(pCont) {
-        pCont.classList.remove('hidden'); pCont.classList.add('active'); pCont.style.display = 'flex';
-        document.getElementById('summaryPackage').textContent = pkg;
-        document.getElementById('summaryPrice').textContent = \`₹\${price}\`;
-        document.getElementById('summaryTotal').textContent = \`₹\${price}\`;
-        document.getElementById('payButton').innerText = \`Pay ₹\${price} via UPI / Card / Netbanking →\`;
+    const successPage = document.getElementById('successPage');
+    if (successPage) {
+        successPage.classList.remove('hidden');
+        successPage.classList.add('active');
+        successPage.style.display = 'block';
+        document.getElementById('displayOrderId').textContent = customerData.orderId;
+        document.getElementById('successParentName').textContent = customerData.parentName;
     }
 };
 
-window.redirectToRazorpay = function() {
-    console.log("Direct Call: redirectToRazorpay");
-    if (window.location.search.includes('test=1')) { 
-        window.renderReportToBrowser().then(() => window.showInstantSuccessPage()); 
-        return; 
+window.goToLandingPage = function() { location.reload(); };
+
+document.addEventListener('DOMContentLoaded', () => {
+    const customerForm = document.getElementById('customerForm');
+    if (customerForm) {
+        customerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            customerData = {
+                parentName: document.getElementById('parentName')?.value || '',
+                childName: document.getElementById('childName')?.value || '',
+                email: document.getElementById('email')?.value || '',
+                phone: document.getElementById('phone')?.value || '',
+                childAge: document.getElementById('childAge')?.value || '5-10',
+                orderId: "AS" + Date.now()
+            };
+            localStorage.setItem('aptskola_last_order_id', customerData.orderId);
+            localStorage.setItem(\`aptskola_session_\${customerData.orderId}\`, JSON.stringify({ answers, customerData }));
+            window.triggerDNAFinalization();
+        });
     }
-    
-    const amountInPaise = selectedPrice * 100;
-    const options = {
-        "key": RAZORPAY_KEY_ID, "amount": amountInPaise, "currency": "INR", "name": "Apt Skola",
-        "description": \`Payment for \${selectedPackage} Report\`,
-        "prefill": { "name": customerData.parentName, "email": customerData.email, "contact": customerData.phone },
-        "handler": function (response) {
-            window.renderReportToBrowser().then(() => window.showInstantSuccessPage());
-        },
-        "theme": { "color": "#FF6B35" }
-    };
-    const rzp = new Razorpay(options);
-    rzp.open();
-};
+    document.addEventListener('click', function(e) {
+        const target = e.target.closest('button') || e.target;
+        if (target.innerText && target.innerText.includes('Start Learning Fitment Analysis')) {
+            currentPhase = 0; window.initializeQuizShell(0);
+        }
+        if (target.id === 'payButton') { window.redirectToRazorpay(); }
+    });
+});
 """
 
-# Re-integration: Merge funnel logic with orig data but REMOVE the old redirectToRazorpay function entirely
-orig = re.sub(r'function redirectToRazorpay\(\) \{.*?\}', '', orig, flags=re.DOTALL)
-orig = orig.replace('localStorage.setItem(\'aptskola_last_order_id\', newOrderId);', 'localStorage.setItem(\'aptskola_last_order_id\', newOrderId); window.triggerDNAFinalization();')
+# MASTER DATA restoration logic
+master_data_match = re.search(r'const MASTER_DATA = \{.*?\};', orig_content, re.DOTALL)
+master_data = master_data_match.group(0) if master_data_match else "const MASTER_DATA = {};"
 
-output = funnel + "\n" + orig
-output += "\ndocument.addEventListener('click', function(e) { if (e.target.id === 'payButton') { e.preventDefault(); window.redirectToRazorpay(); } });"
-output += "\ndocument.addEventListener('click', function(e) { if (e.target.innerText && e.target.innerText.includes('Start Learning Fitment Analysis')) { currentPhase = 0; window.initializeQuizShell(0); } });"
+final_code = funnel_start + questions_code + master_data + funnel_functions
 
 with open('script.js', 'w') as f:
-    f.write(output)
+    f.write(final_code)
