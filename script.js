@@ -1,7 +1,6 @@
-
-// --- STATE MANAGEMENT ---
+// --- GLOBAL STATE ---
 window.phase0Complete = false;
- 
+let currentPhase = 0; 
 let currentQuestionIndex = 0;
 let answers = {};
 let customerData = { orderId: 'N/A', childAge: '5-10', parentName: '', childName: '', email: '', phone: '' };
@@ -32,6 +31,14 @@ const phase1Questions = [
     { id: "q14", text: "Homework involvement?", options: ["High", "Moderate", "Low"] },
     { id: "q15", text: "Where are you looking for schools?", options: ["Metro City", "Tier-2 City", "Small Town"] }
 ];
+
+const MASTER_DATA = { 
+    cbse: { name: "CBSE", title: "The Standardized Strategist", persona: "Convergent Thinker", philosophy: 'Competitive Success.' },
+    icse: { name: "ICSE", title: "The Holistic Communicator", persona: "Verbal Analyst", philosophy: 'Comprehensive Foundation.' },
+    ib: { name: "IB", title: "The Global Inquirer", persona: "Independent Innovator", philosophy: 'Global Citizens.' },
+    'Cambridge (IGCSE)': { name: "Cambridge (IGCSE)", title: "The International Achiever", persona: "Flexible Specialist", philosophy: 'Subject depth.' },
+    'State Board': { name: "State Board", title: "The Regional Contender", persona: "Contextual Learner", philosophy: 'Regional success.' }
+};
 
 window.hideAllSections = function() {
     const sections = ['landingPage', 'aboutAptSkola', 'pricing', 'invest-in-clarity', 'testimonials', 'educatorPartner', 'contact-and-policies', 'mainFooter', 'detailsPage', 'paymentPageContainer', 'questionPages', 'successPage', 'syncMatchGate', 'syncMatchTransition', 'react-hero-root'];
@@ -69,9 +76,9 @@ window.renderQuestionContent = function(index) {
     currentQuestionIndex = index;
     const quizContent = document.getElementById('dynamicQuizContent');
     if (!quizContent) return;
-    const qList = (window.window.currentPhase === 0) ? phase0Questions : phase1Questions;
-    if (window.window.currentPhase === 0 && index >= qList.length) { window.showPsychometricHistogram(); return; }
-    if (window.currentPhase === 1 && index >= qList.length) { 
+    const qList = (currentPhase === 0) ? phase0Questions : phase1Questions;
+    if (currentPhase === 0 && index >= qList.length) { window.showPsychometricHistogram(); return; }
+    if (currentPhase === 1 && index >= qList.length) { 
         window.hideAllSections();
         const dPage = document.getElementById('detailsPage');
         if(dPage) { dPage.classList.remove('hidden'); dPage.classList.add('active'); dPage.style.display = 'flex'; }
@@ -80,7 +87,7 @@ window.renderQuestionContent = function(index) {
     const q = qList[index];
     if(!q) return;
     let progressPercent = 0; let progressColor = "bg-slate-400"; let phaseLabel = "";
-    if (window.window.currentPhase === 0) {
+    if (currentPhase === 0) {
         progressPercent = ((index + 1) / 4) * 100; phaseLabel = "Phase 0: DNA Scan";
     } else {
         const qNum = index + 1;
@@ -134,8 +141,8 @@ window.showPsychometricHistogram = function() {
     let count = 0;
     const interval = setInterval(() => {
         const indexEl = document.getElementById('compIndex');
-        if (indexEl) indexEl.innerText = Math.floor(Math.random() * 30 + 40) + "%";
-        if (++count > 15) { clearInterval(interval); indexEl.innerText = "84%"; indexEl.style.color = "#FF6B35"; setTimeout(window.showSystemicRiskCard, 1500); }
+        if (indexEl) indexEl.innerText = Math.floor(Math.random() * 15 + 72) + "%";
+        if (++count > 15) { clearInterval(interval); indexEl.style.color = "#FF6B35"; setTimeout(window.showSystemicRiskCard, 1500); }
     }, 100);
 };
 
@@ -168,7 +175,7 @@ window.showPhase1BridgeCard = function() {
         </div>`;
 };
 
-window.startPhase1 = function() { window.window.currentPhase = 1; window.initializeQuizShell(0); };
+window.startPhase1 = function() { currentPhase = 1; window.initializeQuizShell(0); };
 
 window.triggerDNAFinalization = function() {
     window.hideAllSections();
@@ -179,7 +186,9 @@ window.triggerDNAFinalization = function() {
         <div class="min-h-screen w-full bg-brand-navy flex flex-col items-center justify-center p-8 relative overflow-hidden">
             <div id="finalGlass" class="absolute inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
                 <div class="absolute inset-0 bg-white/10 backdrop-blur-xl"></div>
-                <div class="relative z-50 text-star-yellow animate-pulse"><svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.5 1.1 2.5 2.5V11h.5c.6 0 1 .4 1 1v4c0 .6-.4 1-1 1H9c-.6 0-1-.4-1-1v-4c0-.6.4-1 1-1h.5V9.5C9.5 8.1 10.6 7 12 7zm0 1.5c-.6 0-1 .4-1 1V11h2V9.5c0-.6-.4-1-1-1z"/></svg></div>
+                <div class="relative z-50 text-[#FFD700] animate-pulse filter drop-shadow-[0_0_10px_#FFD700]">
+                    <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.5 1.1 2.5 2.5V11h.5c.6 0 1 .4 1 1v4c0 .6-.4 1-1 1H9c-.6 0-1-.4-1-1v-4c0-.6.4-1 1-1h.5V9.5C9.5 8.1 10.6 7 12 7zm0 1.5c-.6 0-1 .4-1 1V11h2V9.5c0-.6-.4-1-1-1z"/></svg>
+                </div>
             </div>
             <div class="max-w-2xl w-full z-10">
                 <h2 id="finalStatus" class="text-white text-sm font-bold uppercase tracking-[0.3em] mb-12 text-center">Cross-referencing Academic DNA with 1,200+ School Frameworks...</h2>
@@ -295,18 +304,26 @@ window.showInstantSuccessPage = function() {
     }
 };
 
-const MASTER_DATA = { 
-    cbse: { name: "CBSE", title: "The Standardized Strategist", persona: "Convergent Thinker", philosophy: 'Competitive Success.' },
-    icse: { name: "ICSE", title: "The Holistic Communicator", persona: "Verbal Analyst", philosophy: 'Comprehensive Foundation.' },
-    ib: { name: "IB", title: "The Global Inquirer", persona: "Independent Innovator", philosophy: 'Global Citizens.' },
-    'Cambridge (IGCSE)': { name: "Cambridge (IGCSE)", title: "The International Achiever", persona: "Flexible Specialist", philosophy: 'Subject depth.' },
-    'State Board': { name: "State Board", title: "The Regional Contender", persona: "Contextual Learner", philosophy: 'Regional success.' }
+window.downloadReport = async function() {
+    const preview = document.getElementById('reportPreview');
+    preview.classList.remove('off-screen-render');
+    // html2canvas logic here
+    setTimeout(() => preview.classList.add('off-screen-render'), 1000);
 };
+
+window.sharePDF = async function() {
+    const preview = document.getElementById('reportPreview');
+    preview.classList.remove('off-screen-render');
+    // share logic here
+    setTimeout(() => preview.classList.add('off-screen-render'), 1000);
+};
+
+window.goToLandingPage = function() { location.reload(); };
 
 document.addEventListener('DOMContentLoaded', () => {
     const customerForm = document.getElementById('customerForm');
     if (customerForm) {
-        customerForm.addEventListener('submit', function(e) {
+        customerForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             customerData = {
                 parentName: document.getElementById('parentName')?.value || '',
@@ -316,6 +333,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 childAge: document.getElementById('childAge')?.value || '5-10',
                 orderId: "AS" + Date.now()
             };
+            
+            // Web3Forms integration
+            const formData = new FormData(customerForm);
+            formData.append('orderId', customerData.orderId);
+            try {
+                await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
+            } catch(err) { console.error("Email capture failed", err); }
+
             localStorage.setItem('aptskola_last_order_id', customerData.orderId);
             localStorage.setItem(`aptskola_session_${customerData.orderId}`, JSON.stringify({ answers, customerData }));
             window.triggerDNAFinalization();
@@ -324,7 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('click', function(e) {
         const target = e.target.closest('button') || e.target;
         if (target.innerText && target.innerText.includes('Start Learning Fitment Analysis')) {
-             window.initializeQuizShell(0);
+             currentPhase = 0; window.initializeQuizShell(0);
         }
         if (target.id === 'payButton') { window.redirectToRazorpay(); }
     });
