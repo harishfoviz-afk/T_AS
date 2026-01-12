@@ -15,7 +15,7 @@ const Hero = () => {
   const handleClick = () => {
     console.log("React Button: Triggering Quiz...");
     if (typeof window.initializeQuizShell === 'function') {
-      window.initializeQuizShell(0);
+      window.currentPhase = 0; window.initializeQuizShell(0);
     }
   };
 
