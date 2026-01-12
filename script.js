@@ -1,10 +1,4 @@
-
-window.generateOrderId = function() {
-    const prefix = selectedPrice === 599 ? 'AS5-' : (selectedPrice === 999 ? 'AS9-' : 'AS1-');
-    const random = Math.floor(1000000 + Math.random() * 9000000);
-    return prefix + random;
-};
-
+// --- GLOBAL STATE ---
 window.phase0Complete = false;
 let currentPhase = 0; 
 let currentQuestionIndex = 0;
@@ -19,6 +13,7 @@ window.generateOrderId = function() {
     return prefix + randomDigits;
 };
 
+// --- DATA ---
 const phase0Questions = [
     { id: "p0_q1", text: "How does your child process complex new data?", options: ["Visual/Charts", "Auditory/Discussion", "Kinesthetic/Build"] },
     { id: "p0_q2", text: "Under high-stakes evaluation, what is the default response?", options: ["The Thriver/Speed", "The Deep Thinker/Precision", "The Collaborative"] },
@@ -43,157 +38,20 @@ const phase1Questions = [
     { id: "q14", text: "Homework involvement?", options: ["High", "Moderate", "Low"] },
     { id: "q15", text: "Where are you looking for schools?", options: ["Metro City", "Tier-2 City", "Small Town"] }
 ];
+
 const MASTER_DATA = { 
-    cbse: {
-        name: "CBSE",
-        title: "The Standardized Strategist",
-        persona: "Convergent Thinker",
-        profile: "This profile is characterized by strong retention memory, the ability to handle high-volume data processing, and a high comfort level with objective assessment metrics.",
-        rejectionReason: "Why not IB? Your child prefers structured outcomes. The ambiguity of the IB 'Constructivist' approach may cause unnecessary anxiety.",
-        careerPath: "The Competitive Exam Track (JEE/NEET/UPSC). Grade 9-10 Focus: Foundation building using NCERT. Grade 11-12 Focus: Integrated Coaching or Dummy Schools.",
-        philosophy: 'The National Standard for Competitive Success.',
-        teachingMethod: 'Structured and textbook-focused (NCERT). Emphasis on retaining facts for entrance exams (JEE/NEET).',
-        parentalRole: 'Moderate. Syllabuses are defined. Tutoring is easily outsourced to coaching centers.'
-    },
-    icse: {
-        name: "ICSE",
-        title: "The Holistic Communicator",
-        persona: "Verbal Analyst",
-        profile: "Students with this archetype display high verbal intelligence, strong analytical skills in humanities, and the ability to synthesize disparate pieces of information into a coherent whole.",
-        rejectionReason: "Why not CBSE? Your child thrives on narrative and context. The rote-heavy, objective nature of CBSE might stifle their desire for depth.",
-        careerPath: "The Creative & Liberal Arts Track (Law/Design/Journalism). Grade 9-10: Strong emphasis on Literature/Arts. Grade 11-12: Portfolio development and wide reading.",
-        philosophy: 'The Comprehensive Foundation for Professionals.',
-        teachingMethod: 'Volume-heavy and detailed. Focuses on strong English language command and deep theoretical understanding.',
-        parentalRole: 'High. The volume of projects and detailed syllabus often requires active parental supervision in younger grades.'
-    },
-    ib: {
-        name: "IB",
-        title: "The Global Inquirer",
-        persona: "Independent Innovator",
-        profile: "This cognitive style thrives on openness to experience, exhibits a high tolerance for ambiguity, and possesses the strong self-regulation skills needed for inquiry-based learning.",
-        rejectionReason: "Why not CBSE? Your child requires autonomy. The rigid, defined syllabus of CBSE would likely lead to boredom and disengagement.",
-        careerPath: "The Global Ivy League/Oxbridge Track. Grade 9-10 (MYP): Critical writing. Grade 11-12 (DP): Building the 'Profile' via CAS and Extended Essay.",
-        philosophy: 'Creating Global Citizens and Inquirers.',
-        teachingMethod: 'No fixed textbooks. Students must ask questions, research answers, and write essays.',
-        parentalRole: 'High (Strategic). You cannot just "teach them the chapter." You must help them find resources and manage complex timelines.'
-    },
-    'Cambridge (IGCSE)': {
-        name: "Cambridge (IGCSE)",
-        title: "The International Achiever",
-        persona: "Flexible Specialist",
-        profile: "This profile values subject depth and assessment flexibility, allowing students to tailor their studies for international university application.",
-        rejectionReason: "Why not CBSE? Requires much higher English proficiency and is not directly aligned with Indian competitive exams.",
-        careerPath: "International University Admissions and Specialized Career Paths (Finance, Design).",
-        philosophy: 'Subject depth and international curriculum portability.',
-        teachingMethod: 'Application-based learning. Requires external resources and focuses on critical thinking over rote memorization.',
-        parentalRole: 'Moderate to High. You must manage complex curriculum choices and ensure external support for topics like Math/Science.'
-    },
-    'State Board': {
-        name: "State Board",
-        title: "The Regional Contender",
-        persona: "Contextual Learner",
-        profile: "This profile thrives on learning rooted in regional culture and language, with a focus on local government standards and employment readiness.",
-        rejectionReason: "Why not IB? Highly constrained by local mandates; international portability is severely limited.",
-        careerPath: "State Government Jobs, Local Commerce, and Regional Universities.",
-        philosophy: 'Focus on regional language proficiency and local employment mandates.',
-        teachingMethod: 'Rote-learning heavy, textbook-driven, and often heavily emphasizes regional languages.',
-        parentalRole: 'Low to Moderate. Lower fee structure and simplified objectives make it less demanding.',
-    },
-    financial: {
-        inflationRate: "10-12%",
-        projectionTable: [
-            { grade: "Grade 1 (2025)", fee: "₹ 2,00,000", total: "₹ 2,00,000" },
-            { grade: "Grade 2 (2026)", fee: "₹ 2,20,000", total: "₹ 4,20,000" },
-            { grade: "Grade 3 (2027)", fee: "₹ 2,42,000", total: "₹ 6,62,000" },
-            { grade: "Grade 4 (2028)", fee: "₹ 2,66,200", total: "₹ 9,28,200" },
-            { grade: "Grade 5 (2029)", fee: "₹ 2,92,820", total: "₹ 12,21,020" },
-            { grade: "Grade 6 (2030)", fee: "₹ 3,22,102", total: "₹ 15,43,122" },
-            { grade: "Grade 7 (2031)", fee: "₹ 3,54,312", total: "₹ 18,97,434" },
-            { grade: "Grade 8 (2032)", fee: "₹ 3,89,743", total: "₹ 22,87,177" },
-            { grade: "Grade 9 (2033)", fee: "₹ 4,28,718", total: "₹ 27,15,895" },
-            { grade: "Grade 10 (2034)", fee: "₹ 4,71,589", total: "₹ 31,87,484" },
-            { grade: "Grade 11 (2035)", fee: "₹ 5,18,748", total: "₹ 37,06,232" },
-            { grade: "Grade 12 (2036)", fee: "₹ 5,70,623", total: "₹ 42,76,855" }
-        ],
-        hiddenCosts: [
-            "Transport: ₹40,000 - ₹80,000/year",
-            "Technology Fees: ₹1-2 Lakhs (Laptops/Tablets for IB)",
-            "Field Trips: ₹1-2 Lakhs per trip",
-            "Shadow Coaching (CBSE): ₹2-4 Lakhs/year"
-        ]
-    },
-    vetting: {
-        questions: [
-            { q: "What is your annual teacher turnover rate?", flag: "Red Flag Answer: 'We constantly refresh our faculty...' (Code for: We fire expensive teachers.)" },
-            { q: "Specific protocol for bullying incidents?", flag: "Red Flag Answer: 'We don't really have bullying here.' (Denial is a safety risk.)" },
-            { q: "Instruction for child falling behind?", flag: "Look for specific remedial programs, not generic 'extra classes'." },
-            { q: "How do you handle special needs students?", flag: "Check if they have actual special educators on payroll." },
-            { q: "Are parents allowed on campus during the day?", flag: "Complete lockouts are a communication red flag." }
-        ],
-        redFlags: [
-            "The 'Tired Teacher' Test: Do teachers look exhausted?",
-            "The 'Glossy Brochure' Disconnect: Fancy reception vs. broken furniture.",
-            "Restroom Hygiene: The truest test of dignity.",
-            "Principal Turn-over: Has the principal changed twice in 3 years?",
-            "Library Dust: Are books actually being read?"
-        ]
-    },
-    concierge: {
-        negotiation: [
-            { title: "The 'Lump Sum' Leverage", scenario: "Use when you have liquidity.", script: "If I clear the entire annual tuition in a single transaction this week, what is the best concession structure you can offer on the Admission Fee?" },
-            { title: "The 'Sibling Pipeline' Pitch", scenario: "Use if enrolling a younger child later.", script: "With my younger child entering Grade 1 next year, we are looking at a 15+ year LTV. Can we discuss a waiver on the security deposit?" },
-            { title: "The 'Corporate Tie-up' Query", scenario: "Check if your company is on their list.", script: "Does the school have a corporate partnership with [Company Name]? I'd like to check if my employee status qualifies us for a waiver." }
-        ]
-    },
-    interviewMastery: {
-        part1: [ 
-            { q: "What is your name?", strategy: "Confidence. Eye contact is the gold standard." },
-            { q: "Who did you come with?", strategy: "Recognize family. 'Mommy and Daddy' is perfect." },
-            { q: "Favorite color/toy?", strategy: "Enthusiasm. Watch them light up." },
-            { q: "Pick up the Red block.", strategy: "Listening Skills. Follows instruction once." },
-            { q: "Do you have a pet?", strategy: "Narrative skills. Strings 2-3 sentences." },
-            { q: "What did you eat for breakfast?", strategy: "Memory recall." },
-            { q: "Recite a rhyme.", strategy: "Confidence. Don't force it." },
-            { q: "Biggest object here?", strategy: "Concept check: Big vs Small." },
-            { q: "Who is your best friend?", strategy: "Socialization check." },
-            { q: "What happens if you fall?", strategy: "Resilience. 'I get up' is brave." },
-            { q: "Stack these blocks.", strategy: "Fine motor skills." },
-            { q: "Do you share toys?", strategy: "Honesty. 'No' is often the honest answer." },
-            { q: "What does a dog say?", strategy: "Sound-object association." },
-            { q: "Identify this shape.", strategy: "Academic baseline." },
-            { q: "Tell a story about this picture.", strategy: "Imagination vs Listing items." }
-        ],
-        part2: [ 
-            { q: "Why this school?", strategy: "Align values, don't just say 'It's close'." },
-            { q: "Describe child in 3 words.", strategy: "Be real. 'Energetic' > 'Perfect'." },
-            { q: "Nuclear or Joint family?", strategy: "Context check for support system." },
-            { q: "View on homework?", strategy: "Balance. Value play at this age." },
-            { q: "Handling tantrums?", strategy: "Distraction/Calm corner. Never 'We hit'." },
-            { q: "Who looks after child?", strategy: "Safety logistics check." },
-            { q: "Aspirations?", strategy: "Good human > Doctor/Engineer." },
-            { q: "Screen time?", strategy: "Limited to 30 mins educational." },
-            { q: "If child hits another?", strategy: "Accountability & apology." },
-            { q: "Meals together?", strategy: "Family culture indicator." },
-            { q: "Role in education?", strategy: "Co-learners, not bystanders." },
-            { q: "Child's weakness?", strategy: "Vulnerability. Show you know them." },
-            { q: "Other schools applied?", strategy: "Diplomacy. 'You are first choice'." },
-            { q: "Weekends?", strategy: "Engagement/Stability check." },
-            { q: "Toilet trained?", strategy: "Honesty regarding hygiene." }
-        ],
-        part3: [ 
-            { q: "Child complains about teacher?", strategy: "Listen, but verify context first." },
-            { q: "Definition of Success?", strategy: "Happiness & problem solving." },
-            { q: "Writing at age 5?", strategy: "Trust the motor skill process." },
-            { q: "Child is too quiet?", strategy: "He is an observer, will warm up." },
-            { q: "Parenting style?", strategy: "Authoritative (Boundaries + Warmth)." }
-        ],
-        scoop: [ 
-            { title: "Red Flag", text: "Answering FOR the child loses 10 points instantly." },
-            { title: "Red Flag", text: "Bribing with chocolate in the waiting room." },
-            { title: "Pro Tip", text: "If child freezes, say: 'He is overwhelmed, usually chatty.' Then let it go." }
-        ]
-    }
+    cbse: { name: "CBSE", title: "The Standardized Strategist", persona: "Convergent Thinker", philosophy: 'Competitive Success.', profile: "Strong retention memory.", rejectionReason: "Structured outcomes preferred.", careerPath: "JEE/NEET Track." },
+    icse: { name: "ICSE", title: "The Holistic Communicator", persona: "Verbal Analyst", philosophy: 'Comprehensive Foundation.', profile: "High verbal intelligence.", rejectionReason: "Narrative context preferred.", careerPath: "Liberal Arts Track." },
+    ib: { name: "IB", title: "The Global Inquirer", persona: "Independent Innovator", philosophy: 'Global Citizens.', profile: "Thrives on inquiry.", rejectionReason: "Autonomy required.", careerPath: "Ivy League Track." },
+    'Cambridge (IGCSE)': { name: "Cambridge (IGCSE)", title: "The International Achiever", persona: "Flexible Specialist", philosophy: 'Subject depth.', profile: "Flexible studies.", rejectionReason: "International application focus.", careerPath: "Global Admissions." },
+    'State Board': { name: "State Board", title: "The Regional Contender", persona: "Contextual Learner", philosophy: 'Regional success.', profile: "Culture-rooted learning.", rejectionReason: "Local mandates preferred.", careerPath: "Gov Jobs." },
+    vetting: { redFlags: ["Teacher Turnover", "Broken Furniture", "Restroom Hygiene", "Principal Change", "Library Dust"] },
+    financial: { projectionTable: Array(12).fill({grade: "Grade X", fee: "₹ 2,00,000"}) },
+    concierge: { negotiation: [{title: "Lump Sum Leverage", script: "Clear annual tuition for waiver."}] },
+    interviewMastery: { part2: [{q: "Why this school?", strategy: "Align values."}] }
 };
+
+// --- FUNNEL LOGIC ---
 window.hideAllSections = function() {
     const sections = ['landingPage', 'aboutAptSkola', 'pricing', 'invest-in-clarity', 'testimonials', 'educatorPartner', 'contact-and-policies', 'mainFooter', 'detailsPage', 'paymentPageContainer', 'questionPages', 'successPage', 'syncMatchGate', 'syncMatchTransition', 'react-hero-root'];
     sections.forEach(id => {
@@ -207,8 +65,10 @@ window.initializeQuizShell = function(index) {
     window.hideAllSections();
     const container = document.getElementById('questionPages');
     if (container) {
-        container.classList.remove('hidden'); container.classList.add('active'); container.style.display = 'flex';
-        container.innerHTML = `
+        container.classList.remove('hidden');
+        container.classList.add('active');
+        container.style.display = 'flex';
+        container.innerHTML = \`
             <div id="questionPageApp" class="question-page active" style="display: flex !important; flex-direction: column; min-height: 100vh; width: 100%; background: white; position: fixed; top: 0; left: 0; z-index: 9999;">
                 <div class="intermediate-header" onclick="location.reload()" style="background: #0F172A; color: white; padding: 1rem 2rem; cursor: pointer;">
                     <span class="font-bold text-xl">Apt <span style="color: #FF6B35;">Skola</span></span>
@@ -219,7 +79,7 @@ window.initializeQuizShell = function(index) {
                 <div class="intermediate-footer" style="background: #0F172A; color: #CBD5E1; padding: 1.5rem; text-align: center; font-size: 0.85rem;">
                     © 2026 Apt Skola
                 </div>
-            </div>`;
+            </div>\`;
         window.renderQuestionContent(index);
     }
 };
@@ -239,21 +99,36 @@ window.renderQuestionContent = function(index) {
     const q = qList[index];
     if(!q) return;
     let progressPercent = 0; let progressColor = "bg-slate-400"; let phaseLabel = "";
-    if (currentPhase === 0) { progressPercent = ((index + 1) / 4) * 100; phaseLabel = "Phase 0: DNA Scan"; }
-    else {
+    if (currentPhase === 0) {
+        progressPercent = ((index + 1) / 4) * 100; phaseLabel = "Phase 0: DNA Scan";
+    } else {
         const qNum = index + 1;
         if (qNum <= 5) { progressPercent = 33; progressColor = "bg-slate-400"; phaseLabel = "Mapping Learning DNA"; }
         else if (qNum <= 10) { progressPercent = 66; progressColor = "bg-brand-orange"; phaseLabel = "Analyzing Academic Compatibility"; }
         else { progressPercent = 100; progressColor = "bg-brand-orange animate-pulse shadow-[0_0_15px_rgba(255,107,53,0.6)]"; phaseLabel = "Matching for Board"; }
     }
-    quizContent.innerHTML = `
+    quizContent.innerHTML = \`
         <div class="progress-container mb-10">
-            <div class="progress-track h-2 bg-slate-100 rounded-full overflow-hidden mb-4"><div class="progress-fill h-full ${progressColor} transition-all duration-500" style="width: ${progressPercent}%"></div></div>
-            <div class="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-widest"><span>${phaseLabel}</span><span>Question ${index + 1} / ${qList.length}</span></div>
+            <div class="progress-track h-2 bg-slate-100 rounded-full overflow-hidden mb-4">
+                <div class="progress-fill h-full \${progressColor} transition-all duration-500" style="width: \${progressPercent}%"></div>
+            </div>
+            <div class="flex justify-between items-center text-xs font-bold text-slate-400 uppercase tracking-widest">
+                <span>\${phaseLabel}</span>
+                <span>Question \${index + 1} / \${qList.length}</span>
+            </div>
         </div>
-        <div class="question-text text-3xl font-extrabold text-brand-navy mb-10 leading-tight">${q.text}</div>
-        <div class="options-grid grid gap-4">${q.options.map((opt, i) => `<div class="option-card p-6 bg-slate-50 border-2 border-transparent rounded-2xl cursor-pointer hover:bg-slate-100 transition-all font-bold text-lg text-brand-navy" onclick="window.selectOption('${q.id}', ${i}, ${index}, this)">${opt}</div>`).join('')}</div>
-        <div class="mt-12 text-center"><button onclick="window.handlePrev()" class="text-slate-400 font-bold hover:text-brand-navy transition-colors flex items-center justify-center gap-2 mx-auto uppercase">← PREVIOUS QUESTION</button></div>`;
+        <div class="question-text text-3xl font-extrabold text-brand-navy mb-10 leading-tight">\${q.text}</div>
+        <div class="options-grid grid gap-4">
+            \${q.options.map((opt, i) => \`
+                <div class="option-card p-6 bg-slate-50 border-2 border-transparent rounded-2xl cursor-pointer hover:bg-slate-100 transition-all font-bold text-lg text-brand-navy" 
+                     onclick="window.selectOption('\${q.id}', \${i}, \${index}, this)">\${opt}</div>
+            \`).join('')}
+        </div>
+        <div class="mt-12 text-center">
+            <button onclick="window.handlePrev()" class="text-slate-400 font-bold hover:text-brand-navy transition-colors flex items-center justify-center gap-2 mx-auto uppercase">
+                ← PREVIOUS QUESTION
+            </button>
+        </div>\`;
 };
 
 window.handlePrev = function() { if (currentQuestionIndex > 0) window.renderQuestionContent(currentQuestionIndex - 1); };
@@ -261,18 +136,20 @@ window.selectOption = function(id, val, idx, el) { answers[id] = val; el.style.b
 
 window.showPsychometricHistogram = function() {
     const container = document.getElementById('dynamicQuizContent');
-    container.innerHTML = `
+    container.innerHTML = \`
         <div class="p-8 bg-brand-navy rounded-3xl border border-slate-700 shadow-2xl text-center">
             <h2 class="text-white text-xl font-bold mb-8 uppercase tracking-widest">Psychometric DNA Snapshot</h2>
             <div class="space-y-6 mb-10 text-left">
-                ${['Cognitive Synthesis', 'Pressure Threshold', 'Ambition Vector', 'Logic Architecture'].map(label => `
+                \${['Cognitive Synthesis', 'Pressure Threshold', 'Ambition Vector', 'Logic Architecture'].map(label => \`
                     <div class="space-y-2">
-                        <div class="flex justify-between text-xs font-bold text-slate-400"><span>${label}</span><span>ANALYZING...</span></div>
-                        <div class="h-3 bg-slate-800 rounded-full overflow-hidden"><div class="h-full bg-brand-orange animate-pulse" style="width: ${Math.random() * 40 + 60}%"></div></div>
-                    </div>`).join('')}
+                        <div class="flex justify-between text-xs font-bold text-slate-400"><span>\${label}</span><span>ANALYZING...</span></div>
+                        <div class="h-3 bg-slate-800 rounded-full overflow-hidden">
+                            <div class="h-full bg-brand-orange animate-pulse" style="width: \${Math.random() * 40 + 60}%"></div>
+                        </div>
+                    </div>\`).join('')}
             </div>
             <div id="compIndex" class="text-6xl font-black text-white animate-flicker">--%</div>
-        </div>`;
+        </div>\`;
     let count = 0;
     const interval = setInterval(() => {
         const indexEl = document.getElementById('compIndex');
@@ -283,7 +160,7 @@ window.showPsychometricHistogram = function() {
 
 window.showSystemicRiskCard = function() {
     const container = document.getElementById('dynamicQuizContent');
-    container.innerHTML = `
+    container.innerHTML = \`
         <div class="fixed inset-0 z-[10000] flex items-center justify-center p-6 bg-brand-navy/80 backdrop-blur-sm animate-fade-in">
             <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-lg w-full text-center border-t-8 border-red-500">
                 <div class="text-red-500 text-5xl mb-6 font-black uppercase">⚠️ RISK</div>
@@ -291,12 +168,12 @@ window.showSystemicRiskCard = function() {
                 <p class="text-slate-600 font-medium mb-8 leading-relaxed">Phase 0 data indicates a significant misalignment between natural cognitive syntax and standardized board expectations.</p>
                 <button onclick="window.showPhase1BridgeCard()" class="w-full bg-red-600 text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all">RESOLVE & START PHASE 1 →</button>
             </div>
-        </div>`;
+        </div>\`;
 };
 
 window.showPhase1BridgeCard = function() {
     const container = document.getElementById('dynamicQuizContent');
-    container.innerHTML = `
+    container.innerHTML = \`
         <div class="bg-slate-50 border-2 border-brand-orange rounded-3xl p-8 shadow-2xl animate-fade-in-up">
             <h2 class="text-3xl font-extrabold text-brand-navy mb-6 text-center">Deep-Dive Assessment: Phase 1</h2>
             <p class="text-lg text-slate-700 mb-8 leading-relaxed text-center">You’ve mastered the basics! Now, it’s time for a precision analysis to unlock your child’s detailed fitment roadmap.</p>
@@ -307,7 +184,7 @@ window.showPhase1BridgeCard = function() {
             </div>
             <button onclick="window.startPhase1()" class="w-full bg-brand-orange text-white py-5 rounded-full font-black text-xl shadow-xl hover:scale-105 transition-all mb-4">Analyze My Child’s Fitment Board →</button>
             <p class="text-sm text-slate-500 italic text-center px-4 leading-relaxed">Note: Upon completion, your inputs will generate your Smart Parent Pro Dashboard. Based on your unique data, our engine will recommend the optimal analysis path—ranging from Behavioral Fitment to the comprehensive Institutional Alignment Matrix</p>
-        </div>`;
+        </div>\`;
 };
 
 window.startPhase1 = function() { currentPhase = 1; window.initializeQuizShell(0); };
@@ -317,22 +194,22 @@ window.triggerDNAFinalization = function() {
     const container = document.getElementById("questionPages");
     container.classList.remove("hidden"); container.classList.add("active"); container.style.display = "flex";
     const labels = ["Neural Processing", "Stress Threshold", "Instructional Syntax", "Fiscal Range", "Global Parity"];
-    container.innerHTML = `
+    container.innerHTML = \`
         <div class="min-h-screen w-full bg-brand-navy flex flex-col items-center justify-center p-8 relative overflow-hidden">
             <div id="finalGlass" class="absolute inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-1000">
                 <div class="absolute inset-0 bg-white/10 backdrop-blur-xl"></div>
-                <div class="relative z-50 text-[#FFD700] filter drop-shadow-[0_0_10px_#FFD700] animate-pulse filter drop-shadow-[0_0_10px_#FFD700]">
+                <div class="relative z-50 text-[#FFD700] filter drop-shadow-[0_0_10px_#FFD700] animate-pulse">
                     <svg width="120" height="120" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 6c1.4 0 2.5 1.1 2.5 2.5V11h.5c.6 0 1 .4 1 1v4c0 .6-.4 1-1 1H9c-.6 0-1-.4-1-1v-4c0-.6.4-1 1-1h.5V9.5C9.5 8.1 10.6 7 12 7zm0 1.5c-.6 0-1 .4-1 1V11h2V9.5c0-.6-.4-1-1-1z"/></svg>
                 </div>
             </div>
             <div class="max-w-2xl w-full z-10">
                 <h2 id="finalStatus" class="text-white text-sm font-bold uppercase tracking-[0.3em] mb-12 text-center">Cross-referencing Academic DNA with 1,200+ School Frameworks...</h2>
                 <div class="space-y-8">
-                    ${labels.map((l, i) => `<div class="space-y-3"><div class="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest">${l}</div><div class="h-4 bg-slate-800 rounded-full overflow-hidden"><div id="bar-${i}" class="h-full bg-slate-600 liquid-animate transition-all duration-700" style="width: 50%"></div></div></div>`).join('')}
+                    \${labels.map((l, i) => \`<div class="space-y-3"><div class="flex justify-between text-[10px] font-black text-slate-500 uppercase tracking-widest">\${l}</div><div class="h-4 bg-slate-800 rounded-full overflow-hidden"><div id="bar-\${i}" class="h-full bg-slate-600 liquid-animate transition-all duration-700" style="width: 50%"></div></div></div>\`).join('')}
                 </div>
             </div>
-        </div>`;
-    const bars = labels.map((_, i) => document.getElementById(`bar-${i}`));
+        </div>\`;
+    const bars = labels.map((_, i) => document.getElementById(\`bar-\${i}\`));
     let throbCount = 0;
     const throbInterval = setInterval(() => {
         bars.forEach(bar => { bar.style.width = Math.floor(Math.random() * 80 + 10) + "%"; });
@@ -353,121 +230,9 @@ window.triggerDNAFinalization = function() {
     }, 150);
 };
 
-
-window.renderReportToBrowser = async function() {
-    const res = window.calculateFullRecommendation(answers);
-    const recBoard = res.recommended.name;
-    const boardKey = recBoard.toLowerCase().includes('cbse') ? 'cbse' : 
-                     (recBoard.toLowerCase().includes('icse') ? 'icse' : 
-                     (recBoard.toLowerCase().includes('ib') ? 'ib' : 
-                     (recBoard.toLowerCase().includes('cambridge') ? 'Cambridge (IGCSE)' : 'State Board')));
-    const data = MASTER_DATA[boardKey];
-    const amount = selectedPrice;
-    
-    let html = `
-        <div id="pdf-header" class="report-card" style="background:#0F172A; color:white; text-align:center;">
-            <div style="font-size:2rem; font-weight:800;">Apt <span style="color:#FF6B35;">Skola</span></div>
-            <div style="font-size:1.1rem; opacity:0.8;">\${selectedPackage} Report</div>
-            <div style="font-size:0.85rem; margin-top:10px;">ID: \${customerData.orderId} | Prepared for: \${customerData.childName}</div>
-        </div>
-
-        <div class="report-card">
-            <div class="report-header-bg">THE RECOMMENDED ARCHETYPE</div>
-            <div style="font-size:1.8rem; font-weight:800; color:#0F172A;">\${data.title}</div>
-            <div style="margin-top:10px; padding:10px; background:#F8FAFC; border-radius:8px; display:inline-block;">
-                Board Match: <span style="color:#FF6B35; font-weight:bold;">\${recBoard} (\${res.recommended.percentage}%)</span>
-            </div>
-        </div>
-
-        <div class="report-card">
-            <div class="report-header-bg">STUDENT PERSONA & MATCH LOGIC</div>
-            <p><strong>Archetype:</strong> \${data.persona}</p>
-            <p style="margin-top:10px; line-height:1.6;">\${data.profile}</p>
-            <div style="margin-top:15px; padding:15px; border-left:4px solid #EF4444; background:#FFF1F2;">
-                <h4 style="color:#991B1B; font-weight:bold; margin-bottom:5px;">The "Why Not" (Rejection Logic)</h4>
-                <p style="font-size:0.9rem;">\${data.rejectionReason}</p>
-            </div>
-        </div>
-
-        <div class="report-card">
-            <div class="report-header-bg">BOARD COMPARISON</div>
-            <table class="data-table">
-                \${res.fullRanking.slice(0, 3).map(r => `<tr><td>\${r.name}</td><td>\${r.percentage}% Match</td></tr>`).join('')}
-            </table>
-        </div>
-
-        <div class="report-card">
-            <div class="report-header-bg">BOARD DEEP DIVE</div>
-            <p><strong>Philosophy:</strong> \${data.philosophy}</p>
-            <p style="margin-top:10px;"><strong>Pedagogy:</strong> \${data.teachingMethod}</p>
-        </div>
-    `;
-
-    if (amount >= 999) {
-        html += `
-            <div class="report-card">
-                <div class="report-header-bg">🧐 RISK MITIGATION & VETTING</div>
-                <ul style="list-style:none; padding:0; font-size:0.9rem;">
-                    \${MASTER_DATA.vetting.redFlags.map(f => \`<li style="margin-bottom:8px;">🚩 \${f}</li>\`).join('')}
-                </ul>
-            </div>
-            <div class="report-card">
-                <div class="report-header-bg">15-YEAR FEE FORECASTER</div>
-                <table class="data-table">
-                    \${MASTER_DATA.financial.projectionTable.map(r => \`<tr><td>\${r.grade}</td><td>\${r.fee}</td></tr>\`).join('')}
-                </table>
-            </div>
-        `;
-    }
-
-    if (amount >= 1499) {
-        html += `
-            <div class="report-card">
-                <div class="report-header-bg">🤝 FEE NEGOTIATION STRATEGIES</div>
-                \${MASTER_DATA.concierge.negotiation.map(n => \`<div class="script-box" style="margin-bottom:15px;"><strong>\${n.title}:</strong> \${n.script}</div>\`).join('')}
-            </div>
-            <div class="report-card">
-                <div class="report-header-bg">🎙️ PARENT INTERVIEW MASTERY</div>
-                <div class="interview-grid">
-                    \${MASTER_DATA.interviewMastery.part2.slice(0, 6).map(i => \`<div class="interview-card"><strong>\${i.q}</strong><p>Strategy: \${i.strategy}</p></div>\`).join('')}
-                </div>
-            </div>
-        `;
-    }
-
-    const preview = document.getElementById('reportPreview');
-    if (preview) { preview.innerHTML = html; preview.classList.remove('off-screen-render'); }
-};
-
-
-
-window.showInstantSuccessPage = function() {
-    window.hideAllSections();
-    const successPage = document.getElementById('successPage');
-    if (successPage) {
-        successPage.classList.remove('hidden'); successPage.classList.add('active'); successPage.style.display = 'block';
-        document.getElementById('displayOrderId').textContent = customerData.orderId;
-        document.getElementById('successParentName').textContent = customerData.parentName;
-        
-        // Inject Shadow Buttons
-        const container = document.querySelector('.success-container');
-        if (container) {
-            const shadowButtons = `
-                <div style="display: flex; gap: 15px; margin-bottom: 25px; justify-content: center;">
-                    <button onclick="window.openSyncMatchGate()" style="background: #0F172A; color: #white; padding: 12px 20px; border-radius: 50px; font-weight: 800; border: 2px solid #FF6B35; cursor: pointer; color: white;">Parent and Child Sync Check</button>
-                    <a href="https://xray.aptskola.com" target="_blank" style="background: #FF6B35; color: white; padding: 12px 20px; border-radius: 50px; font-weight: 800; text-decoration: none;">School/College X-ray</a>
-                </div>
-            `;
-            container.insertAdjacentHTML('afterbegin', shadowButtons);
-        }
-    }
-};
-
-
 window.selectPackage = function(pkg, price) {
     selectedPackage = pkg; selectedPrice = price;
-    const newOrderId = window.generateOrderId();
-    customerData.orderId = newOrderId;
+    customerData.orderId = window.generateOrderId();
     window.hideAllSections();
     const pCont = document.getElementById('paymentPageContainer');
     if(pCont) {
@@ -516,36 +281,77 @@ window.calculateFullRecommendation = function(ansSet) {
     return { recommended: results[0], alternative: results[1], fullRanking: results };
 };
 
-async function downloadReport() {
+window.renderReportToBrowser = async function() {
+    const res = window.calculateFullRecommendation(answers);
+    const recBoard = res.recommended.name;
+    const boardKey = recBoard.toLowerCase().includes('cbse') ? 'cbse' : 
+                     (recBoard.toLowerCase().includes('icse') ? 'icse' : 
+                     (recBoard.toLowerCase().includes('ib') ? 'ib' : 
+                     (recBoard.toLowerCase().includes('cambridge') ? 'Cambridge (IGCSE)' : 'State Board')));
+    const data = MASTER_DATA[boardKey];
+    
+    let html = \`
+        <div id="pdf-header" class="report-card" style="background:#0F172A; color:white; text-align:center;">
+            <div style="font-size:2rem; font-weight:800;">Apt <span style="color:#FF6B35;">Skola</span></div>
+            <div style="font-size:1.1rem; opacity:0.8;">\${selectedPackage} Report</div>
+            <div style="font-size:0.85rem; margin-top:10px;">ID: \${customerData.orderId} | Prepared for: \${customerData.childName}</div>
+        </div>
+        <div class="report-card">
+            <div class="report-header-bg">THE RECOMMENDED ARCHETYPE</div>
+            <div style="font-size:1.8rem; font-weight:800; color:#0F172A;">\${data.title}</div>
+            <div style="margin-top:10px; padding:10px; background:#F8FAFC; border-radius:8px; display:inline-block;">
+                Board Match: <span style="color:#FF6B35; font-weight:bold;">\${recBoard} (\${res.recommended.percentage}%)</span>
+            </div>
+        </div>\`;
     const preview = document.getElementById('reportPreview');
-    const btn = document.getElementById('downloadBtn');
-    preview.classList.remove('off-screen-render');
-    const canvas = await html2canvas(preview, { scale: 2 });
-    const imgData = canvas.toDataURL('image/png');
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF('p', 'mm', 'a4');
-    pdf.addImage(imgData, 'PNG', 0, 0, 210, 297);
-    pdf.save(\`AptSkola_Report_\${customerData.childName}.pdf\`);
-    preview.classList.add('off-screen-render');
-}
+    if (preview) { preview.innerHTML = html; preview.classList.remove('off-screen-render'); }
+};
 
-window.goToLandingPage = function() { location.reload(); };
+window.showInstantSuccessPage = function() {
+    window.hideAllSections();
+    const successPage = document.getElementById('successPage');
+    if (successPage) {
+        successPage.classList.remove('hidden'); successPage.classList.add('active'); successPage.style.display = 'block';
+        document.getElementById('displayOrderId').textContent = customerData.orderId;
+        document.getElementById('successParentName').textContent = customerData.parentName;
+    }
+};
+
+window.downloadReport = async function() {
+    const preview = document.getElementById('reportPreview');
+    preview.classList.remove('off-screen-render');
+    const { jsPDF } = window.jspdf;
+    const canvas = await html2canvas(preview);
+    const img = canvas.toDataURL("image/png");
+    const pdf = new jsPDF();
+    pdf.addImage(img, 'PNG', 0, 0, 210, 297);
+    pdf.save("AptSkola_Report.pdf");
+    preview.classList.add('off-screen-render');
+};
+
+window.sharePDF = () => alert("Share logic ready.");
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Landing Page Shadow Buttons
+    const landing = document.getElementById('landingPage');
+    if (landing) {
+        const shadowButtons = \`
+            <div style="position: absolute; top: 1.5rem; right: 1.5rem; display: flex; gap: 1rem; z-index: 1000;">
+                <button onclick="window.openSyncMatchGate()" style="background: #0F172A; color: white; padding: 10px 18px; border-radius: 50px; font-weight: 700; border: 2px solid #FF6B35; cursor: pointer; font-size: 0.8rem;">Parent and Child Sync Check</button>
+                <a href="https://xray.aptskola.com" target="_blank" style="background: #FF6B35; color: white; padding: 10px 18px; border-radius: 50px; font-weight: 700; text-decoration: none; font-size: 0.8rem;">School/College X-ray</a>
+            </div>\`;
+        landing.insertAdjacentHTML('afterbegin', shadowButtons);
+    }
+
     const customerForm = document.getElementById('customerForm');
     if (customerForm) {
-        
         customerForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             const res = window.calculateFullRecommendation(answers);
-            customerData = {
-                parentName: document.getElementById('parentName')?.value || '',
-                childName: document.getElementById('childName')?.value || '',
-                email: document.getElementById('email')?.value || '',
-                phone: document.getElementById('phone')?.value || '',
-                childAge: document.getElementById('childAge')?.value || '5-10',
-                orderId: window.generateOrderId()
-            };
+            customerData.parentName = document.getElementById('parentName')?.value || '';
+            customerData.childName = document.getElementById('childName')?.value || '';
+            customerData.email = document.getElementById('email')?.value || '';
+            customerData.phone = document.getElementById('phone')?.value || '';
             
             const formData = new FormData(customerForm);
             formData.append('orderId', customerData.orderId);
@@ -556,16 +362,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 await fetch("https://api.web3forms.com/submit", { method: "POST", body: formData });
             } catch(err) { console.error("Email capture failed", err); }
 
-            localStorage.setItem('aptskola_last_order_id', customerData.orderId);
-            localStorage.setItem(`aptskola_session_${customerData.orderId}`, JSON.stringify({ answers, customerData }));
-            window.triggerDNAFinalization();
-        });
- } 
-            catch(err) { console.error("Lead capture failed", err); }
-
             window.triggerDNAFinalization();
         });
     }
+
     document.addEventListener('click', function(e) {
         const target = e.target.closest('button') || e.target;
         if (target.innerText && target.innerText.includes('Start Learning Fitment Analysis')) {
@@ -574,31 +374,3 @@ document.addEventListener('DOMContentLoaded', () => {
         if (target.id === 'payButton') { window.redirectToRazorpay(); }
     });
 });
-
-window.downloadReport = async function() {
-    const btn = document.getElementById("downloadBtn");
-    const originalText = btn.textContent;
-    btn.textContent = "Generating PDF...";
-    const preview = document.getElementById('reportPreview');
-    preview.classList.remove('off-screen-render');
-    
-    const { jsPDF } = window.jspdf;
-    const pdf = new jsPDF("p", "mm", "a4");
-    const cards = preview.querySelectorAll('.report-card');
-    
-    for (let i = 0; i < cards.length; i++) {
-        const canvas = await html2canvas(cards[i], { scale: 2 });
-        const imgData = canvas.toDataURL("image/jpeg", 0.8);
-        if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 10, 10, 190, 0);
-    }
-    
-    pdf.save(`Apt-Skola-\${customerData.childName}.pdf`);
-    preview.classList.add('off-screen-render');
-    btn.textContent = originalText;
-};
-
-window.sharePDF = async function() {
-    // Similar logic to download but using navigator.share
-    alert("Share feature preparing...");
-};
