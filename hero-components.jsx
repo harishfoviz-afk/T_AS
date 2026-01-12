@@ -15,15 +15,33 @@ const Hero = () => {
   const handleClick = () => {
     console.log("React Button: Triggering Quiz...");
     if (typeof window.initializeQuizShell === 'function') {
-      window.currentPhase = 0; window.initializeQuizShell(0);
+      window.currentPhase = 0;
+      window.initializeQuizShell(0);
     }
   };
 
   return (
     <section className="relative pt-40 pb-28 px-4 overflow-hidden bg-brand-navy min-h-[90vh] flex flex-col items-center justify-center">
+      {/* High-Contrast Shadow Buttons - Landing Page Top Right */}
+      <div className="absolute top-6 right-6 flex gap-4 z-[1000]">
+          <button 
+            onClick={() => window.openSyncMatchGate && window.openSyncMatchGate()} 
+            style={{background: '#0F172A', color: 'white', padding: '12px 22px', borderRadius: '50px', fontWeight: '800', border: '2px solid #FF6B35', cursor: 'pointer', boxShadow: '0 4px 15px rgba(255,107,53,0.3)'}}
+          >
+              Parent and Child Sync Check
+          </button>
+          <a 
+            href="https://xray.aptskola.com" 
+            target="_blank" 
+            style={{background: '#FF6B35', color: 'white', padding: '12px 22px', borderRadius: '50px', fontWeight: '800', textDecoration: 'none', boxShadow: '0 4px 15px rgba(255,107,53,0.3)'}}
+          >
+              School/College X-ray
+          </a>
+      </div>
+
       <div className="hero-top-nav">
           <span className="font-extrabold text-white text-2xl">Apt <span className="text-brand-orange">Skola</span></span>
-          <span className="w-px h-6 bg-slate-700"></span>
+          <span className="w-px h-6 bg-slate-700 mx-4"></span>
           <span className="text-sm font-medium tracking-wide uppercase text-slate-400">A Foviz Venture</span>
       </div>
 
