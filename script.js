@@ -2,7 +2,7 @@
 window.phase0Complete = false;
 window.currentPhase = 0; 
 let currentQuestionIndex = 0;
-let answers = {};
+window.answers = {}; // Exposed globally for momentum features
 let customerData = { orderId: 'N/A', childAge: '5-10', parentName: '', childName: '', email: '', phone: '' };
 let selectedPackage = 'Essential';
 let selectedPrice = 599;
@@ -96,7 +96,7 @@ window.renderQuestionContent = function(index) {
 };
 
 window.handlePrev = function() { if (currentQuestionIndex > 0) window.renderQuestionContent(currentQuestionIndex - 1); };
-window.selectOption = function(id, val, idx, el) { answers[id] = val; el.style.borderColor = "#0F172A"; setTimeout(() => window.renderQuestionContent(idx + 1), 300); };
+window.selectOption = function(id, val, idx, el) { window.answers[id] = val; el.style.borderColor = "#0F172A"; setTimeout(() => window.renderQuestionContent(idx + 1), 300); };
 
 window.showPsychometricHistogram = function() {
     const container = document.getElementById('dynamicQuizContent');

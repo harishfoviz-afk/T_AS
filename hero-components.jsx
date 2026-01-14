@@ -1,4 +1,4 @@
-// Comprehensive Hero Component Overhaul - Functional & UI
+// Comprehensive Hero Component Overhaul - Functional & UI & Momentum
 const { useState, useEffect, useRef } = React;
 const { motion, AnimatePresence } = window.Motion || window.FramerMotion || {};
 
@@ -6,20 +6,34 @@ const Hero = () => {
   const words = ["Worrying", "Doubting", "Guessing", "Knowing"];
   const [index, setIndex] = useState(0);
   const [buttonText, setButtonText] = useState("Scan My Child's Academic Fitment");
+  const [showToast, setShowToast] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setIndex((prev) => (prev + 1) % words.length), 2000);
     return () => clearInterval(timer);
   }, []);
 
-  const triggerStart = () => {
-    console.log("Main CTA Triggered: Ensuring window.currentPhase = 0 and Launching Quiz...");
-    window.currentPhase = 0; // Safety Constraint: Reset every time
+  // Momentum Feature 2: Progressive Slide-In (Nudge)
+  useEffect(() => {
+    const timer = setTimeout(() => setShowToast(true), 5000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const triggerStart = (startAtIndex = 0) => {
+    console.log(`Main CTA Triggered: Ensuring window.currentPhase = 0 and Launching Quiz at index ${startAtIndex}...`);
+    window.currentPhase = 0;
     if (typeof window.initializeQuizShell === 'function') {
-      window.initializeQuizShell(0);
+      window.initializeQuizShell(startAtIndex);
     } else {
       console.error("Quiz Engine not ready. window.initializeQuizShell is missing.");
     }
+  };
+
+  // Momentum Feature 1: Phase 0 Preview Logic
+  const handlePhase0OptionClick = (optionIndex) => {
+    window.answers = window.answers || {};
+    window.answers["p0_q1"] = optionIndex;
+    triggerStart(1); // Launch at index 1 since 0 is answered
   };
 
   // Critical Functional Fix: "Unstoppable" Global Click Listener
@@ -32,12 +46,11 @@ const Hero = () => {
       if (text.includes("Start Learning Fitment Analysis") || text.includes("Scan My Child's Academic Fitment")) {
         console.log("Global Unstoppable Catch: CTA Clicked via text match:", text);
         
-        // Rename if it was the old text
         if (text.includes("Start Learning Fitment Analysis")) {
             setButtonText("Scan My Child's Academic Fitment");
         }
 
-        triggerStart();
+        triggerStart(0);
       }
     };
     window.addEventListener('click', handleGlobalClick, true);
@@ -49,9 +62,10 @@ const Hero = () => {
   const getWordColor = () => words[index] === "Knowing" ? "text-[#FF6B35]" : "text-white";
 
   return (
+    <>
     <section className="relative pt-32 pb-20 px-4 overflow-hidden bg-[#0F172A] min-h-[95vh] flex flex-col items-center">
       
-      {/* 1. Top Right Shadow Buttons (Secondary Actions) */}
+      {/* 1. Top Right Shadow Buttons */}
       <div className="absolute top-6 right-6 flex flex-col md:flex-row gap-4 z-[1000]">
           <button 
             onClick={() => window.openSyncMatchGate && window.openSyncMatchGate()} 
@@ -70,7 +84,7 @@ const Hero = () => {
           </a>
       </div>
 
-      {/* 2. Centered Branding Block - Positioned Vertically Below Shadow Buttons */}
+      {/* 2. Centered Branding Block */}
       <div className="mt-16 mb-12 text-center animate-fade-in-up">
         <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter">
           Apt <span className="text-[#FF6B35]">Skola</span>
@@ -129,16 +143,35 @@ const Hero = () => {
           </p>
       </div>
 
-      {/* 5. The "Unstoppable" CTA Button */}
+      {/* 5. The "Unstoppable" CTA Button - Momentum Feature 3: Visual Cue */}
       <div className="relative mt-16 group z-[9999]">
         <div className="absolute -inset-4 bg-gradient-to-r from-[#FF6B35] via-orange-500 to-yellow-500 rounded-full blur-2xl opacity-40 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
         <button 
-          onClick={triggerStart}
-          className="relative bg-[#FF6B35] text-white px-10 md:px-20 py-6 md:py-8 rounded-full font-black text-2xl md:text-4xl shadow-[0_20px_50px_rgba(255,107,53,0.5)] hover:scale-105 active:scale-95 transition-all border-b-[8px] border-orange-800 flex items-center gap-6"
-          style={{ pointerEvents: 'auto' }}
+          onClick={() => triggerStart(0)}
+          className="cta-button-pulse relative bg-[#FF6B35] text-white px-10 md:px-20 py-6 md:py-8 rounded-full font-black text-2xl md:text-4xl shadow-[0_20px_50px_rgba(255,107,53,0.5)] hover:scale-105 active:scale-95 transition-all border-b-[8px] border-orange-800 flex items-center gap-6"
+          style={{ pointerEvents: 'auto', animationDelay: '3s' }}
         >
           {buttonText} <span className="animate-pulse inline-block text-4xl md:text-6xl">→</span>
         </button>
+      </div>
+
+      {/* Momentum Feature 1: First Question Embed */}
+      <div className="mt-24 w-full max-w-4xl bg-slate-900/50 border border-slate-700/50 p-8 md:p-12 rounded-[40px] backdrop-blur-xl">
+          <div className="text-center mb-10">
+              <span className="text-[#FF6B35] font-black uppercase tracking-[0.3em] text-sm">Question 1 of 4: Phase 0 Preview</span>
+              <h2 className="text-white text-2xl md:text-4xl font-extrabold mt-4">How does your child process complex new data?</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {["Visual/Charts", "Auditory/Discussion", "Kinesthetic/Build"].map((opt, i) => (
+                  <button 
+                    key={i}
+                    onClick={() => handlePhase0OptionClick(i)}
+                    className="p-6 bg-slate-800/50 border-2 border-slate-700 rounded-2xl text-white font-bold text-xl hover:bg-[#FF6B35] hover:border-[#FF6B35] transition-all transform hover:-translate-y-2"
+                  >
+                      {opt}
+                  </button>
+              ))}
+          </div>
       </div>
 
       {/* Background Atmosphere */}
@@ -146,6 +179,28 @@ const Hero = () => {
       <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[180px] pointer-events-none" />
 
     </section>
+
+    {/* Momentum Feature 2: Progressive Slide-In Toast */}
+    <AnimatePresence>
+        {showToast && (
+            <motion.div 
+                initial={{ x: 400, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: 400, opacity: 0 }}
+                className="fixed bottom-8 right-8 z-[10000] bg-white p-6 rounded-3xl shadow-2xl border-l-[8px] border-[#FF6B35] max-w-xs"
+            >
+                <button onClick={() => setShowToast(false)} className="absolute top-4 right-4 text-slate-400 hover:text-slate-600">✕</button>
+                <p className="text-slate-900 font-bold leading-tight mb-4">Ready to see which board fits your child's personality? (Takes 2 mins)</p>
+                <button 
+                    onClick={() => { triggerStart(0); setShowToast(false); }}
+                    className="w-full bg-[#FF6B35] text-white py-3 rounded-full font-black text-sm uppercase tracking-widest hover:scale-105 transition-all shadow-lg"
+                >
+                    Start Now
+                </button>
+            </motion.div>
+        )}
+    </AnimatePresence>
+    </>
   );
 };
 
