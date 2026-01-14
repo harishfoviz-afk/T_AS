@@ -28,6 +28,7 @@ const PAYMENT_LINKS = {
     1499: "https://rzp.io/rzp/1L9W83a",
     299: "https://rzp.io/rzp/Jq71ACDV"
 };
+window.currentPhase = 0; // 0: Phase0, 1: Phase1, 2: Sync
 
 
 // --- INITIALIZATION ---
@@ -254,7 +255,15 @@ const MASTER_DATA = {
     }
 };
 
-const questions = [
+
+const phase0Questions = [
+    { id: "p0_q1", text: "How does your child process complex new data?", options: ["Visual/Charts", "Auditory/Discussion", "Kinesthetic/Build"] },
+    { id: "p0_q2", text: "Which environment triggers their best ideas?", options: ["Quiet/Structured", "Collaborative/Noisy", "Outdoor/Nature"] },
+    { id: "p0_q3", text: "How do they handle a completely new puzzle?", options: ["Study the box/instructions", "Try and fail repeatedly", "Ask someone to show them"] },
+    { id: "p0_q4", text: "What is their natural curiosity driver?", options: ["How things work", "Why things happen", "What can I create"] }
+];
+
+const phase1Questions = [
     { id: "q1", text: "How does your child learn best?", options: ["By seeing images, videos, and diagrams (Visual)", "By listening to stories and discussions (Auditory)", "By doing experiments and building things (Kinesthetic)", "A mix of everything / Adaptable"] },
     { id: "q2", text: "What subject does your child naturally enjoy?", options: ["Maths, Logic, and Puzzles", "English, Stories, and Art", "Science, Nature, and asking 'Why?'", "A bit of everything / Balanced"] },
     { id: "q3", text: "What is the big future goal?", options: ["Crack Indian Exams (IIT-JEE / NEET / UPSC)", "Study Abroad (University in US/UK/Canada)", "Entrepreneurship or Creative Arts", "Not sure yet / Keep options open"] },
@@ -671,7 +680,15 @@ function goToLandingPage() {
     const form = document.getElementById('customerForm');
     if(form) form.reset();
     
+    // Show landing elements
     document.getElementById('landingPage').classList.remove('hidden');
+    document.getElementById('pricing').classList.remove('hidden');
+    document.getElementById('testimonials').classList.remove('hidden');
+    document.getElementById('educatorPartner').classList.remove('hidden');
+    document.getElementById('contact-and-policies').classList.remove('hidden');
+    document.getElementById('mainFooter').classList.remove('hidden');
+    
+    // Hide app pages
     const dPage = document.getElementById('detailsPage');
     if(dPage) dPage.classList.add('hidden');
     const pCont = document.getElementById('paymentPageContainer');
@@ -701,21 +718,26 @@ function openSyncMatchGate() {
     const gate = document.getElementById('syncMatchGate');
     
     if (landing && gate) {
+        // Hide landing elements
         landing.classList.add('hidden');
+        document.getElementById('pricing').classList.add('hidden');
+        document.getElementById('testimonials').classList.add('hidden');
+        document.getElementById('educatorPartner').classList.add('hidden');
+        document.getElementById('contact-and-policies').classList.add('hidden');
+        document.getElementById('mainFooter').classList.add('hidden');
+        
         gate.classList.remove('hidden');
         gate.classList.add('active'); 
         
         // --- CTO FIX: Injecting the missing ads into the gate ---
         const gateContent = gate.querySelector('.details-form');
         if (gateContent && !gateContent.querySelector('.xray-card')) {
-            // We inject the X-ray card and Foviz banner before the "Go Back Home" link
             const backLink = gateContent.querySelector('p[onclick*="goToLandingPage"]');
             if (backLink) {
                 backLink.insertAdjacentHTML('beforebegin', xrayCardHtml);
                 backLink.insertAdjacentHTML('beforebegin', fovizBannerHtml);
             }
         }
-        
         window.scrollTo(0, 0);
     }
 }
@@ -845,7 +867,7 @@ function startSyncMatchNow() {
         transition.classList.remove('active');
         transition.classList.add('hidden');
     }
-    initializeQuizShell(15); 
+    initializeQuizShell(15, 2); 
 }
 
 // --- SCORING LOGIC ---
@@ -944,14 +966,37 @@ function proceedToQuiz(pkg, price) {
     selectedPackage = pkg;
     selectedPrice = price;
     isSyncMatchMode = false; 
+    
+    // Hide landing elements
     document.getElementById('landingPage').classList.add('hidden');
+    document.getElementById('pricing').classList.add('hidden');
+    document.getElementById('testimonials').classList.add('hidden');
+    document.getElementById('educatorPartner').classList.add('hidden');
+    document.getElementById('contact-and-policies').classList.add('hidden');
+    document.getElementById('mainFooter').classList.add('hidden');
+    
     initializeQuizShell(0);
     window.scrollTo({ top: 0, behavior: 'instant' });
 }
 
-function initializeQuizShell(index) {
+
+
+function initializeQuizShell(index, phase = 0) {
+    window.currentPhase = phase;
     const questionPages = document.getElementById('questionPages');
     if (!questionPages) return;
+    
+    // Hide landing elements and flow containers
+    const landing = document.getElementById('landingPage');
+    if (landing) landing.classList.add('hidden');
+    document.getElementById('pricing').classList.add('hidden');
+    document.getElementById('testimonials').classList.add('hidden');
+    document.getElementById('educatorPartner').classList.add('hidden');
+    document.getElementById('contact-and-policies').classList.add('hidden');
+    document.getElementById('mainFooter').classList.add('hidden');
+
+    const containers = document.querySelectorAll('.flow-container');
+    containers.forEach(c => c.classList.remove('active'));
     
     const shellHtml = `
         <div id="questionPageApp" class="question-page active">
@@ -963,15 +1008,75 @@ function initializeQuizShell(index) {
     renderQuestionContent(index);
 }
 
+            <div class="question-content-wrapper"><div id="dynamicQuizContent" class="question-container"></div></div>
+            ${getIntermediateFooterHtml()}
+        </div>`;
+    questionPages.innerHTML = shellHtml;
+    renderQuestionContent(index);
+}
+
+            <div class="question-content-wrapper"><div id="dynamicQuizContent" class="question-container"></div></div>
+            ${getIntermediateFooterHtml()}
+        </div>`;
+    questionPages.innerHTML = shellHtml;
+    renderQuestionContent(index);
+}
+
+
 function renderQuestionContent(index) {
     currentQuestion = index;
+    const currentQuestions = window.currentPhase === 0 ? phase0Questions : phase1Questions;
+    const totalQ = currentQuestions.length;
 
-    if (!isSyncMatchMode && index >= 15) { 
-        const app = document.getElementById('questionPageApp');
-        if (app) app.classList.remove('active');
-        showDetailsPage(); 
-        return; 
+    if (index >= totalQ) {
+        if (window.currentPhase === 0) {
+            showPsychometricHistogram();
+        } else if (window.currentPhase === 1) {
+            showDetailsPage();
+        } else if (window.currentPhase === 2) {
+             calculateSyncMatch();
+        }
+        return;
     }
+
+    const q = currentQuestions[index];
+    if(!q) return;
+
+    let qText = q.text;
+    let qOptions = q.options || [];
+
+    if(q.isObservation) {
+        qText = q.text_variants[customerData.childAge] || q.text_variants["5-10"];
+        if(q.options_variants && q.options_variants[customerData.childAge]) {
+            qOptions = q.options_variants[customerData.childAge];
+        }
+    }
+
+    const progressPercent = ((index + 1) / totalQ * 100).toFixed(0);
+    const optionsHTML = qOptions.map((opt, i) => {
+        const isSelected = answers[q.id] === i ? 'selected' : '';
+        return `<div class="option-card ${isSelected}" onclick="selectOption('${q.id}', ${i}, ${index}, this)">${opt}</div>`;
+    }).join('');
+
+    let prevBtnHtml = '';
+    if (index > 0) {
+        prevBtnHtml = `<button onclick="renderQuestionContent(${index - 1})" class="btn-prev" style="margin-top:20px; background:none; text-decoration:underline; border:none; color:#64748B; cursor:pointer;">← Previous Question</button>`;
+    }
+
+    const dynamicQuizContent = document.getElementById('dynamicQuizContent');
+    if (dynamicQuizContent) {
+        dynamicQuizContent.innerHTML = `
+            <div class="progress-container">
+                <div class="progress-track"><div class="progress-fill" style="width: ${progressPercent}%"></div></div>
+                <div class="progress-label">Phase ${window.currentPhase} - Question ${index + 1}/${totalQ}</div>
+            </div>
+            <div class="question-text">${qText}</div>
+            <div class="options-grid">${optionsHTML}</div>
+            <div style="text-align:center;">${prevBtnHtml}</div>
+        `;
+    }
+}
+
     if (isSyncMatchMode && index >= 30) { 
         const app = document.getElementById('questionPageApp');
         if (app) app.classList.remove('active');
@@ -1119,7 +1224,7 @@ document.getElementById('customerForm')?.addEventListener('submit', function(e) 
 
 
     setTimeout(() => {
-        document.getElementById('detailsPage').classList.add('hidden');
+        showDnaFinalization();
         const pCont = document.getElementById('paymentPageContainer');
         if(pCont) {
             pCont.classList.remove('hidden');
@@ -2188,3 +2293,101 @@ window.recoverSession = recoverSession;
 window.recoverSessionEmail = recoverSessionEmail;
 
 window.openCollaborationModal = openCollaborationModal;
+function showPsychometricHistogram() {
+    const app = document.getElementById('questionPageApp');
+    if (app) app.classList.remove('active');
+    
+    const container = document.getElementById('psychometricHistogram');
+    container.innerHTML = `
+        <h2 class="text-3xl font-bold mb-4">DNA Snapshot: Analyzing Neural Patterns</h2>
+        <p class="text-slate-600 mb-8">We are mapping your child's cognitive architecture based on Phase 0 inputs.</p>
+        <div class="histogram-container">
+            <div class="histo-bar-wrapper">
+                <div class="histo-label"><span>Visual Processing</span><span>82%</span></div>
+                <div class="histo-track"><div class="histo-fill" style="width: 82%"></div></div>
+            </div>
+            <div class="histo-bar-wrapper">
+                <div class="histo-label"><span>Auditory Synthesis</span><span>45%</span></div>
+                <div class="histo-track"><div class="histo-fill" style="width: 45%"></div></div>
+            </div>
+            <div class="histo-bar-wrapper">
+                <div class="histo-label"><span>Kinesthetic Logic</span><span>91%</span></div>
+                <div class="histo-track"><div class="histo-fill" style="width: 91%"></div></div>
+            </div>
+        </div>
+        <button onclick="showDynamicRiskCard()" class="custom-cta-button" style="max-width: 300px;">View Misalignment Risk →</button>
+    `;
+    container.classList.add('active');
+    window.scrollTo(0,0);
+}
+
+function showDynamicRiskCard() {
+    const containers = document.querySelectorAll('.flow-container');
+    containers.forEach(c => c.classList.remove('active'));
+    
+    const q1Ans = answers['p0_q1'];
+    const personas = ["Visual Strategist", "Verbal Analyst", "Conceptual Learner"];
+    const selectedPersona = personas[q1Ans] || "Unique Learner";
+    
+    const container = document.getElementById('dynamicRiskCard');
+    container.innerHTML = `
+        <div class="risk-card-dynamic">
+            <div class="risk-icon-alert">⚠️</div>
+            <h2 class="text-2xl font-bold text-red-900 mb-2">Misalignment Alert</h2>
+            <p class="text-red-800 mb-6">Your child is a <strong>${selectedPersona}</strong>. There is a 65% risk that a standard curriculum will suppress their natural logic processing.</p>
+            <div style="background: white; padding: 20px; border-radius: 12px; text-align: left; margin-bottom: 20px;">
+                <p class="text-sm font-bold text-slate-700 mb-2">Smart Parent Pro Dashboard Note:</p>
+                <p class="text-xs text-slate-500">Phase 1 will now calibrate your specific board preferences to mitigate this risk.</p>
+            </div>
+            <button onclick="startPhase1()" class="custom-cta-button" style="background: #0F172A;">Calibrate with Phase 1 →</button>
+        </div>
+    `;
+    container.classList.add('active');
+    window.scrollTo(0,0);
+}
+
+function startPhase1() {
+    window.currentPhase = 1;
+    initializeQuizShell(0, 1);
+}
+
+
+function showDnaFinalization() {
+    const detailsPage = document.getElementById('detailsPage');
+    if (detailsPage) detailsPage.classList.add('hidden');
+    
+    // Hide quiz shell if active
+    const app = document.getElementById('questionPageApp');
+    if (app) app.classList.remove('active');
+
+    const container = document.getElementById('dnaFinalization');
+    container.innerHTML = `
+        <div class="dna-final-sequence">
+            <div class="gold-trust-icon">
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
+            <h2 class="text-4xl font-black text-brand-navy mb-4">DNA ALIGNMENT COMPLETE</h2>
+            <p class="text-xl text-slate-600 mb-12">Your profile is secured. Redirecting to final validation...</p>
+            <div class="spinner"></div>
+        </div>
+    `;
+    container.classList.add('active');
+    window.scrollTo(0,0);
+    
+    setTimeout(() => {
+        container.classList.remove('active');
+        const pricing = document.getElementById('pricing');
+        if (pricing) {
+            pricing.classList.remove('hidden');
+            pricing.scrollIntoView({ behavior: 'smooth' });
+            
+            // Re-show footer for pricing page
+            document.getElementById('mainFooter').classList.remove('hidden');
+            document.getElementById('contact-and-policies').classList.remove('hidden');
+        }
+    }, 3000);
+}
+);
+        }
+    }, 3000);
+}

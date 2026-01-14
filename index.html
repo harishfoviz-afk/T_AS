@@ -100,6 +100,7 @@
     </script>
     
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="flow-styles.css">
     <script>window.process = { env: { NODE_ENV: "production" } };</script>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -163,7 +164,7 @@
 <div id="invest-in-clarity" class="block">
 </div>
 
-<section id="pricing" class="hidden bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 scroll-mt-20">
+<section id="pricing" class="block bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 scroll-mt-20">
 			<div class="max-w-7xl mx-auto">
 			<div id="invest-in-clarity" class="text-center mb-12 scroll-mt-24">
 				<h2 class="text-brand-orange font-bold tracking-wide uppercase text-sm mb-2">Invest in Clarity</h2>
@@ -423,6 +424,11 @@
     </div>
 
     <div id="questionPages"></div>
+    <div id="flowContainers">
+        <div id="psychometricHistogram" class="flow-container"></div>
+        <div id="dynamicRiskCard" class="flow-container"></div>
+        <div id="dnaFinalization" class="flow-container"></div>
+    </div>
     <div id="authorityBridge" class="hidden"></div>
 
     <div id="detailsPage" class="details-page hidden">
