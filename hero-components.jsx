@@ -69,7 +69,7 @@ const Hero = () => {
       <div className="absolute top-6 right-6 flex flex-col md:flex-row gap-4 z-[1000]">
           <button 
             onClick={() => window.openSyncMatchGate && window.openSyncMatchGate()} 
-            className="text-xs font-bold text-white border-2 border-orange-500/30 px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl"
+            className="text-xs font-bold text-white border-2 border-[#FF6B35] px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl"
             style={{background: 'rgba(30, 41, 59, 0.8)', cursor: 'pointer'}}
           >
               Unlock Parent & Child Sync Check
@@ -77,15 +77,15 @@ const Hero = () => {
           <a 
             href="https://xray.aptskola.com" 
             target="_blank" 
-            className="text-xs font-bold text-white border-2 border-orange-500/30 px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl text-center"
+            className="text-xs font-bold text-white border-2 border-[#FFD700] px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl text-center"
             style={{background: 'rgba(30, 41, 59, 0.8)'}}
           >
               🔎 AI School/College Forensic Report
           </a>
       </div>
 
-      {/* 2. Centered Branding Block */}
-      <div className="mt-16 mb-12 text-center animate-fade-in-up">
+      {/* 2. Centered Branding Block - Reduced mt-16 to mt-4 to decrease gap */}
+      <div className="mt-4 mb-12 text-center animate-fade-in-up">
         <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter">
           Apt <span className="text-[#FF6B35]">Skola</span>
         </h1>
