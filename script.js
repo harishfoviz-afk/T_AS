@@ -2,7 +2,7 @@
 window.phase0Complete = false;
 window.currentPhase = 0; 
 let currentQuestionIndex = 0;
-window.answers = {}; // Exposed globally for momentum features
+window.answers = {}; 
 let customerData = { orderId: 'N/A', childAge: '5-10', parentName: '', childName: '', email: '', phone: '' };
 let selectedPackage = 'Essential';
 let selectedPrice = 599;
@@ -97,6 +97,30 @@ window.renderQuestionContent = function(index) {
 
 window.handlePrev = function() { if (currentQuestionIndex > 0) window.renderQuestionContent(currentQuestionIndex - 1); };
 window.selectOption = function(id, val, idx, el) { window.answers[id] = val; el.style.borderColor = "#0F172A"; setTimeout(() => window.renderQuestionContent(idx + 1), 300); };
+
+// --- PRICING LOGIC ---
+window.selectPackage = function(pkg, price) {
+    console.log("Package Selected:", pkg, price);
+    selectedPackage = pkg;
+    selectedPrice = price;
+    
+    // Update summary in payment page
+    const sPkg = document.getElementById('summaryPackage');
+    const sPrice = document.getElementById('summaryPrice');
+    const sTotal = document.getElementById('summaryTotal');
+    
+    if (sPkg) sPkg.innerText = pkg;
+    if (sPrice) sPrice.innerText = '₹' + price;
+    if (sTotal) sTotal.innerText = '₹' + price;
+    
+    window.hideAllSections();
+    const paymentPage = document.getElementById('paymentPageContainer');
+    if (paymentPage) {
+        paymentPage.classList.remove('hidden');
+        paymentPage.classList.add('active');
+        paymentPage.style.display = 'flex';
+    }
+};
 
 window.showPsychometricHistogram = function() {
     const container = document.getElementById('dynamicQuizContent');
@@ -250,3 +274,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// Mock for Razorpay or actual redirect
+window.redirectToRazorpay = function() {
+    alert("Redirecting to payment gateway for " + selectedPackage + " package at ₹" + selectedPrice);
+    // In actual app, this would trigger Razorpay
+    setTimeout(() => {
+        window.hideAllSections();
+        const successPage = document.getElementById('successPage');
+        if (successPage) {
+            successPage.classList.remove('hidden');
+            successPage.classList.add('active');
+            successPage.style.display = 'flex';
+            document.getElementById('displayOrderId').innerText = customerData.orderId;
+            document.getElementById('successParentName').innerText = customerData.parentName || "Parent";
+        }
+    }, 2000);
+};
+
+window.openCollaborationModal = function(type) {
+    const modal = document.getElementById('collaborationModal');
+    if (modal) modal.classList.add('active');
+};
