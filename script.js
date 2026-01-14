@@ -682,7 +682,7 @@ function goToLandingPage() {
     
     // Show landing elements
     document.getElementById('landingPage').classList.remove('hidden');
-    document.getElementById('pricing').classList.remove('hidden');
+    document.getElementById('pricingModal').classList.remove('active');
     document.getElementById('testimonials').classList.remove('hidden');
     document.getElementById('educatorPartner').classList.remove('hidden');
     document.getElementById('contact-and-policies').classList.remove('hidden');
@@ -690,15 +690,15 @@ function goToLandingPage() {
     
     // Hide app pages
     const dPage = document.getElementById('detailsPage');
-    if(dPage) dPage.classList.add('hidden');
+    if(dPage) dPage.classList.remove('active');
     const pCont = document.getElementById('paymentPageContainer');
-    if(pCont) pCont.classList.add('hidden');
+    if(pCont) pCont.classList.remove('active');
     const sPage = document.getElementById('successPage');
-    if(sPage) sPage.classList.add('hidden');
+    if(sPage) sPage.classList.remove('active');
     const sGate = document.getElementById('syncMatchGate');
-    if(sGate) sGate.classList.add('hidden');
+    if(sGate) sGate.classList.remove('active');
     const sTrans = document.getElementById('syncMatchTransition');
-    if(sTrans) sTrans.classList.add('hidden');
+    if(sTrans) sTrans.classList.remove('active');
     
     const app = document.getElementById('questionPageApp');
     if (app) app.classList.remove('active');
@@ -719,12 +719,12 @@ function openSyncMatchGate() {
     
     if (landing && gate) {
         // Hide landing elements
-        landing.classList.add('hidden');
-        document.getElementById('pricing').classList.add('hidden');
-        document.getElementById('testimonials').classList.add('hidden');
-        document.getElementById('educatorPartner').classList.add('hidden');
-        document.getElementById('contact-and-policies').classList.add('hidden');
-        document.getElementById('mainFooter').classList.add('hidden');
+        landing.classList.remove('active');
+        document.getElementById('pricingModal').classList.remove('active');
+        document.getElementById('testimonials').classList.remove('active');
+        document.getElementById('educatorPartner').classList.remove('active');
+        document.getElementById('contact-and-policies').classList.remove('active');
+        document.getElementById('mainFooter').classList.remove('active');
         
         gate.classList.remove('hidden');
         gate.classList.add('active'); 
@@ -758,7 +758,7 @@ function validateAndStartSyncMatch() {
         const uBlock = document.getElementById('upgradeBlock');
         if(uBlock) uBlock.classList.remove('hidden');
         const sBtn = document.getElementById('startSyncBtn');
-        if(sBtn) sBtn.classList.add('hidden');
+        if(sBtn) sBtn.classList.remove('active');
         const manualBlock = document.getElementById('manualSyncBlock');
         if(manualBlock) manualBlock.style.display = 'none';
         return; 
@@ -782,7 +782,7 @@ function validateAndStartSyncMatch() {
     if (orderId.startsWith('AS1-') || orderId.startsWith('AS9-')) {
         isSyncMatchMode = true; 
         isManualSync = false; 
-        document.getElementById('syncMatchGate').classList.add('hidden');
+        document.getElementById('syncMatchGate').classList.remove('active');
         showSyncTransition();
     } 
     else {
@@ -824,7 +824,7 @@ function confirmManualSync() {
     isManualSync = true;
     isSyncMatchMode = true;
 
-    document.getElementById('syncMatchGate').classList.add('hidden');
+    document.getElementById('syncMatchGate').classList.remove('active');
     showSyncTransition();
 }
 
@@ -865,7 +865,7 @@ function startSyncMatchNow() {
     const transition = document.getElementById('syncMatchTransition');
     if (transition) {
         transition.classList.remove('active');
-        transition.classList.add('hidden');
+        transition.classList.remove('active');
     }
     initializeQuizShell(15, 2); 
 }
@@ -968,12 +968,12 @@ function proceedToQuiz(pkg, price) {
     isSyncMatchMode = false; 
     
     // Hide landing elements
-    document.getElementById('landingPage').classList.add('hidden');
-    document.getElementById('pricing').classList.add('hidden');
-    document.getElementById('testimonials').classList.add('hidden');
-    document.getElementById('educatorPartner').classList.add('hidden');
-    document.getElementById('contact-and-policies').classList.add('hidden');
-    document.getElementById('mainFooter').classList.add('hidden');
+    document.getElementById('landingPage').classList.remove('active');
+    document.getElementById('pricingModal').classList.remove('active');
+    document.getElementById('testimonials').classList.remove('active');
+    document.getElementById('educatorPartner').classList.remove('active');
+    document.getElementById('contact-and-policies').classList.remove('active');
+    document.getElementById('mainFooter').classList.remove('active');
     
     initializeQuizShell(0);
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -988,12 +988,12 @@ function initializeQuizShell(index, phase = 0) {
     
     // Hide landing elements and flow containers
     const landing = document.getElementById('landingPage');
-    if (landing) landing.classList.add('hidden');
-    document.getElementById('pricing').classList.add('hidden');
-    document.getElementById('testimonials').classList.add('hidden');
-    document.getElementById('educatorPartner').classList.add('hidden');
-    document.getElementById('contact-and-policies').classList.add('hidden');
-    document.getElementById('mainFooter').classList.add('hidden');
+    if (landing) landing.classList.remove('active');
+    document.getElementById('pricingModal').classList.remove('active');
+    document.getElementById('testimonials').classList.remove('active');
+    document.getElementById('educatorPartner').classList.remove('active');
+    document.getElementById('contact-and-policies').classList.remove('active');
+    document.getElementById('mainFooter').classList.remove('active');
 
     const containers = document.querySelectorAll('.flow-container');
     containers.forEach(c => c.classList.remove('active'));
@@ -1488,7 +1488,7 @@ function processSyncUpgrade() {
             const upgradeBlock = document.getElementById('upgradeBlock');
             const startBtn = document.getElementById('startSyncBtn');
             
-            if(upgradeBlock) upgradeBlock.classList.add('hidden');
+            if(upgradeBlock) upgradeBlock.classList.remove('active');
             if(startBtn) {
                 startBtn.classList.remove('hidden');
                 startBtn.innerText = "Access Unlocked! Start Sync Check →";
@@ -1541,7 +1541,7 @@ function showInstantSuccessPage() {
     successContainer.insertAdjacentHTML('afterbegin', backupNotice);
 }	
     if(paymentPage) {
-        paymentPage.classList.add('hidden');
+        paymentPage.classList.remove('active');
         console.log("Payment page hidden");
     }
     if(successPage) {
@@ -2227,7 +2227,7 @@ function recoverSession() {
         customerData = data.customerData;
         selectedPrice = customerData.amount || 599;
         selectedPackage = customerData.package || 'Essential';
-        document.getElementById('landingPage').classList.add('hidden');
+        document.getElementById('landingPage').classList.remove('active');
         renderReportToBrowser().then(() => {
             showInstantSuccessPage();
             console.log("CTO Update: Session recovered for " + orderId);
@@ -2263,7 +2263,7 @@ function recoverSessionEmail(targetEmail) {
         selectedPackage = foundSession.selectedPackage || customerData.package || 'Essential';
         
         const landing = document.getElementById('landingPage');
-        if (landing) landing.classList.add('hidden');
+        if (landing) landing.classList.remove('active');
         
         renderReportToBrowser().then(() => {
             showInstantSuccessPage();
@@ -2354,7 +2354,7 @@ function startPhase1() {
 
 function showDnaFinalization() {
     const detailsPage = document.getElementById('detailsPage');
-    if (detailsPage) detailsPage.classList.add('hidden');
+    if (detailsPage) detailsPage.classList.remove('active');
     
     // Hide quiz shell if active
     const app = document.getElementById('questionPageApp');
@@ -2376,9 +2376,9 @@ function showDnaFinalization() {
     
     setTimeout(() => {
         container.classList.remove('active');
-        const pricing = document.getElementById('pricing');
+        const pricing = document.getElementById('pricingModal');
         if (pricing) {
-            pricing.classList.remove('hidden');
+            pricing.classList.add('active');
             pricing.scrollIntoView({ behavior: 'smooth' });
             
             // Re-show footer for pricing page
