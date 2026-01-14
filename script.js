@@ -1103,6 +1103,21 @@ document.getElementById('customerForm')?.addEventListener('submit', function(e) 
     .then(() => console.log("Lead captured via Web3Forms"))
     .catch((error) => console.error("Web3Forms Error:", error));
 
+// --- PIXEL RETARGETING TRIGGER ---
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'InitiateCheckout', {
+            content_name: selectedPackage,
+            value: selectedPrice,
+            currency: 'INR'
+        });
+    }
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'begin_checkout', {
+            items: [{ item_name: selectedPackage, price: selectedPrice }]
+        });
+    }
+
+
     setTimeout(() => {
         document.getElementById('detailsPage').classList.add('hidden');
         const pCont = document.getElementById('paymentPageContainer');
@@ -1118,23 +1133,6 @@ document.getElementById('customerForm')?.addEventListener('submit', function(e) 
         window.scrollTo({ top: 0, behavior: 'instant' });
     }, 500);
 });
-
-// --- PIXEL RETARGETING TRIGGER ---
-    if (typeof fbq !== 'undefined') {
-        fbq('track', 'InitiateCheckout', {
-            content_name: selectedPackage,
-            value: selectedPrice,
-            currency: 'INR'
-        });
-    }
-    if (typeof gtag !== 'undefined') {
-        gtag('event', 'begin_checkout', {
-            items: [{ item_name: selectedPackage, price: selectedPrice }]
-        });
-    }
-
-    const formData = new FormData(this);
-    formData.append('orderId', newOrderId);
 
 // --- RAZORPAY POPUP METHOD (WITH AUTO-PREFILL) ---
 function testPaymentSuccess() {
@@ -1797,21 +1795,6 @@ async function renderReportToBrowser() {
 }
 
 
-function hydrateData() {
-    if (!customerData || !customerData.orderId || customerData.orderId === "N/A") {
-        const lastOrderId = localStorage.getItem("aptskola_last_order_id");
-        if (lastOrderId) {
-            const sessionData = JSON.parse(localStorage.getItem("aptskola_session_" + lastOrderId));
-            if (sessionData) {
-                answers = sessionData.answers;
-                customerData = sessionData.customerData;
-                selectedPackage = sessionData.selectedPackage || sessionData.customerData.package;
-                selectedPrice = sessionData.selectedPrice || sessionData.customerData.amount;
-                console.log("Data hydrated for action.");
-            }
-        }
-    }
-}
 
 
 // --- OPTIMIZED: SMART PDF GENERATOR WITH NATIVE VECTOR HEADER ---
@@ -2185,3 +2168,23 @@ function recoverSessionEmail(targetEmail) {
         alert("No assessment found for this email on this device.");
     }
 }
+// Attach functions to window for React/External access
+window.initializeQuizShell = initializeQuizShell;
+window.selectPackage = selectPackage;
+window.openSyncMatchGate = openSyncMatchGate;
+window.openPricingOrScroll = openPricingOrScroll;
+window.openPricingModal = openPricingModal;
+window.scrollToClarity = scrollToClarity;
+window.openSampleReport = openSampleReport;
+window.closeSampleReport = closeSampleReport;
+window.goToLandingPage = goToLandingPage;
+window.renderReportToBrowser = renderReportToBrowser;
+window.downloadReport = downloadReport;
+window.sharePDF = sharePDF;
+window.validateAndStartSyncMatch = validateAndStartSyncMatch;
+window.pasteOrderId = pasteOrderId;
+window.copyOrderId = copyOrderId;
+window.recoverSession = recoverSession;
+window.recoverSessionEmail = recoverSessionEmail;
+
+window.openCollaborationModal = openCollaborationModal;
