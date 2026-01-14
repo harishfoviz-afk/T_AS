@@ -123,7 +123,7 @@ const Hero = () => {
       </div>
 
       <p className="text-slate-400 text-lg md:text-2xl text-center max-w-3xl mx-auto mt-12 leading-relaxed font-medium">
-        Get a scientific, personalized board recommendation based on your child's unique psychology in 5 minutes.
+        Get a scientific, personalized board recommendation based on your child's unique psychology in <span className="text-white underline underline-offset-4 decoration-[#FF6B35]/50 whitespace-nowrap"><span className="inline-block mr-2">⏱️</span>5 minutes</span>.
       </p>
 
       {/* 4. Social Proof Avatar Row */}
@@ -148,10 +148,10 @@ const Hero = () => {
         <div className="absolute -inset-4 bg-gradient-to-r from-[#FF6B35] via-orange-500 to-yellow-500 rounded-full blur-2xl opacity-40 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
         <button 
           onClick={() => triggerStart(0)}
-          className="cta-button-pulse relative bg-[#FF6B35] text-white px-10 md:px-20 py-6 md:py-8 rounded-full font-black text-2xl md:text-4xl shadow-[0_20px_50px_rgba(255,107,53,0.5)] hover:scale-105 active:scale-95 transition-all border-b-[8px] border-orange-800 flex items-center gap-6"
+          className="cta-button-pulse relative bg-[#FF6B35] text-white px-8 md:px-12 py-4 md:py-6 rounded-full font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,107,53,0.5)] hover:scale-105 active:scale-95 transition-all border-b-[6px] border-orange-800 flex items-center gap-4"
           style={{ pointerEvents: 'auto', animationDelay: '3s' }}
         >
-          {buttonText} <span className="animate-pulse inline-block text-4xl md:text-6xl">→</span>
+          {buttonText} <span className="animate-pulse inline-block text-3xl md:text-4xl">→</span>
         </button>
       </div>
 
