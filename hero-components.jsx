@@ -14,11 +14,23 @@ const Hero = () => {
 
   const handleClick = () => {
     console.log("React Button: Triggering Quiz...");
+    window.currentPhase = 0;
     if (typeof window.initializeQuizShell === 'function') {
-      window.currentPhase = 0;
       window.initializeQuizShell(0);
     }
   };
+
+  // Global click listener fail-safe
+  useEffect(() => {
+    const handleGlobalClick = (e) => {
+      if (e.target && e.target.textContent && e.target.textContent.includes("Start Learning Fitment Analysis")) {
+        console.log("Global catch: Start Learning Fitment Analysis clicked");
+        handleClick();
+      }
+    };
+    window.addEventListener('click', handleGlobalClick);
+    return () => window.removeEventListener('click', handleGlobalClick);
+  }, []);
 
   return (
     <section className="relative pt-40 pb-28 px-4 overflow-hidden bg-brand-navy min-h-[90vh] flex flex-col items-center justify-center">
@@ -26,14 +38,16 @@ const Hero = () => {
       <div className="absolute top-6 right-6 flex gap-4 z-[1000]">
           <button 
             onClick={() => window.openSyncMatchGate && window.openSyncMatchGate()} 
-            style={{background: '#0F172A', color: 'white', padding: '12px 22px', borderRadius: '50px', fontWeight: '800', border: '2px solid #FF6B35', cursor: 'pointer', boxShadow: '0 4px 15px rgba(255,107,53,0.3)'}}
+            className="border-2 border-orange-500"
+            style={{background: '#0F172A', color: 'white', padding: '6px 14px', borderRadius: '50px', fontWeight: '800', fontSize: '0.8rem', cursor: 'pointer', boxShadow: '0 4px 15px rgba(249,115,22,0.3)'}}
           >
               Parent and Child Sync Check
           </button>
           <a 
             href="https://xray.aptskola.com" 
             target="_blank" 
-            style={{background: '#FF6B35', color: 'white', padding: '12px 22px', borderRadius: '50px', fontWeight: '800', textDecoration: 'none', boxShadow: '0 4px 15px rgba(255,107,53,0.3)'}}
+            className="border-2 border-yellow-500"
+            style={{background: '#0F172A', color: 'white', padding: '6px 14px', borderRadius: '50px', fontWeight: '800', fontSize: '0.8rem', textDecoration: 'none', boxShadow: '0 4px 15px rgba(234,179,8,0.3)'}}
           >
               School/College X-ray
           </a>
@@ -47,7 +61,7 @@ const Hero = () => {
 
       <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center">
         <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 h-32 md:h-40">
-          <h1 className="text-4xl md:text-7xl font-extrabold text-white text-center leading-tight">
+          <h1 className={`text-4xl md:text-7xl font-extrabold text-center leading-tight ${words[index] === "Knowing" ? "text-green-500" : "text-red-500"}`}>
             {words[index] === "Knowing" ? "START" : "STOP"}
           </h1>
           <div className="overflow-hidden h-16 md:h-24 flex items-center">
