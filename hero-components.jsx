@@ -1,102 +1,155 @@
-// Final React Hero Component Fix
+// Comprehensive Hero Component Overhaul - Functional & UI
 const { useState, useEffect, useRef } = React;
 const { motion, AnimatePresence } = window.Motion || window.FramerMotion || {};
 
 const Hero = () => {
   const words = ["Worrying", "Doubting", "Guessing", "Knowing"];
-  const colors = ["text-orange-300", "text-blue-300", "text-orange-300", "text-brand-orange"];
   const [index, setIndex] = useState(0);
+  const [buttonText, setButtonText] = useState("Scan My Child's Academic Fitment");
 
   useEffect(() => {
     const timer = setInterval(() => setIndex((prev) => (prev + 1) % words.length), 2000);
     return () => clearInterval(timer);
   }, []);
 
-  const handleClick = () => {
-    console.log("React Button: Triggering Quiz...");
-    window.currentPhase = 0;
+  const triggerStart = () => {
+    console.log("Main CTA Triggered: Ensuring window.currentPhase = 0 and Launching Quiz...");
+    window.currentPhase = 0; // Safety Constraint: Reset every time
     if (typeof window.initializeQuizShell === 'function') {
       window.initializeQuizShell(0);
+    } else {
+      console.error("Quiz Engine not ready. window.initializeQuizShell is missing.");
     }
   };
 
-  // Global click listener fail-safe
+  // Critical Functional Fix: "Unstoppable" Global Click Listener
   useEffect(() => {
     const handleGlobalClick = (e) => {
-      if (e.target && e.target.textContent && e.target.textContent.includes("Start Learning Fitment Analysis")) {
-        console.log("Global catch: Start Learning Fitment Analysis clicked");
-        handleClick();
+      const target = e.target;
+      if (!target) return;
+      
+      const text = target.textContent || "";
+      if (text.includes("Start Learning Fitment Analysis") || text.includes("Scan My Child's Academic Fitment")) {
+        console.log("Global Unstoppable Catch: CTA Clicked via text match:", text);
+        
+        // Rename if it was the old text
+        if (text.includes("Start Learning Fitment Analysis")) {
+            setButtonText("Scan My Child's Academic Fitment");
+        }
+
+        triggerStart();
       }
     };
-    window.addEventListener('click', handleGlobalClick);
-    return () => window.removeEventListener('click', handleGlobalClick);
+    window.addEventListener('click', handleGlobalClick, true);
+    return () => window.removeEventListener('click', handleGlobalClick, true);
   }, []);
 
+  const getPrefix = () => words[index] === "Knowing" ? "START" : "STOP";
+  const getPrefixColor = () => words[index] === "Knowing" ? "text-green-500" : "text-red-500";
+  const getWordColor = () => words[index] === "Knowing" ? "text-[#FF6B35]" : "text-white";
+
   return (
-    <section className="relative pt-40 pb-28 px-4 overflow-hidden bg-brand-navy min-h-[90vh] flex flex-col items-center justify-center">
-      {/* High-Contrast Shadow Buttons - Landing Page Top Right */}
-      <div className="absolute top-6 right-6 flex gap-4 z-[1000]">
+    <section className="relative pt-32 pb-20 px-4 overflow-hidden bg-[#0F172A] min-h-[95vh] flex flex-col items-center">
+      
+      {/* 1. Top Right Shadow Buttons (Secondary Actions) */}
+      <div className="absolute top-6 right-6 flex flex-col md:flex-row gap-4 z-[1000]">
           <button 
             onClick={() => window.openSyncMatchGate && window.openSyncMatchGate()} 
-            className="border-2 border-orange-500"
-            style={{background: '#0F172A', color: 'white', padding: '6px 14px', borderRadius: '50px', fontWeight: '800', fontSize: '0.8rem', cursor: 'pointer', boxShadow: '0 4px 15px rgba(249,115,22,0.3)'}}
+            className="text-xs font-bold text-white border-2 border-orange-500/30 px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl"
+            style={{background: 'rgba(30, 41, 59, 0.8)', cursor: 'pointer'}}
           >
-              Parent and Child Sync Check
+              Unlock Parent & Child Sync Check
           </button>
           <a 
             href="https://xray.aptskola.com" 
             target="_blank" 
-            className="border-2 border-yellow-500"
-            style={{background: '#0F172A', color: 'white', padding: '6px 14px', borderRadius: '50px', fontWeight: '800', fontSize: '0.8rem', textDecoration: 'none', boxShadow: '0 4px 15px rgba(234,179,8,0.3)'}}
+            className="text-xs font-bold text-white border-2 border-orange-500/30 px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl text-center"
+            style={{background: 'rgba(30, 41, 59, 0.8)'}}
           >
-              School/College X-ray
+              🔎 AI School/College Forensic Report
           </a>
       </div>
 
-      <div className="hero-top-nav">
-          <span className="font-extrabold text-white text-2xl">Apt <span className="text-brand-orange">Skola</span></span>
-          <span className="w-px h-6 bg-slate-700 mx-4"></span>
-          <span className="text-sm font-medium tracking-wide uppercase text-slate-400">A Foviz Venture</span>
+      {/* 2. Centered Branding Block - Positioned Vertically Below Shadow Buttons */}
+      <div className="mt-16 mb-12 text-center animate-fade-in-up">
+        <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter">
+          Apt <span className="text-[#FF6B35]">Skola</span>
+        </h1>
+        <div className="flex items-center justify-center gap-3 mt-4 opacity-70">
+          <div className="h-px w-8 bg-slate-600"></div>
+          <span className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em]">A Foviz Venture</span>
+          <div className="h-px w-8 bg-slate-600"></div>
+        </div>
       </div>
 
-      <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center">
-        <div className="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4 h-32 md:h-40">
-          <h1 className={`text-4xl md:text-7xl font-extrabold text-center leading-tight ${words[index] === "Knowing" ? "text-green-500" : "text-red-500"}`}>
-            {words[index] === "Knowing" ? "START" : "STOP"}
-          </h1>
-          <div className="overflow-hidden h-16 md:h-24 flex items-center">
-            <AnimatePresence mode="wait">
-              <motion.h1
-                key={words[index]}
-                initial={{ y: 40, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -40, opacity: 0 }}
-                transition={{ duration: 0.5, ease: "backOut" }}
-                className={`text-4xl md:text-7xl font-extrabold text-center leading-tight ${colors[index]}`}
-              >
-                {words[index]}
-              </motion.h1>
-            </AnimatePresence>
-          </div>
+      {/* 3. The Animated Transformation Headline */}
+      <div className="flex flex-col items-center justify-center gap-4 min-h-[160px]">
+        <div className="flex items-center gap-4 md:gap-8">
+            <span className={`text-5xl md:text-8xl font-black transition-colors duration-500 ${getPrefixColor()}`}>
+                {getPrefix()}
+            </span>
+            <div className="overflow-hidden h-20 md:h-32 flex items-center">
+                <AnimatePresence mode="wait">
+                    <motion.span
+                        key={words[index]}
+                        initial={{ y: 50, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -50, opacity: 0 }}
+                        transition={{ duration: 0.5, ease: "backOut" }}
+                        className={`text-5xl md:text-8xl font-black ${getWordColor()}`}
+                    >
+                        {words[index]}
+                    </motion.span>
+                </AnimatePresence>
+            </div>
         </div>
-
-        <p className="text-brand-orange font-bold text-xl md:text-2xl mt-4 uppercase tracking-wider text-center">Find Your Child's Perfect School Board</p>
-        
-        <p className="text-slate-400 text-lg md:text-2xl text-center max-w-3xl mx-auto mt-8 leading-relaxed font-medium">
-          Get a scientific, personalized board recommendation based on your child's unique psychology in 5 minutes.
+        <p className="text-[#FF6B35] font-black text-xl md:text-3xl mt-4 uppercase tracking-[0.25em] text-center drop-shadow-lg">
+            Find Your Child's Perfect School Board
         </p>
+      </div>
 
+      <p className="text-slate-400 text-lg md:text-2xl text-center max-w-3xl mx-auto mt-12 leading-relaxed font-medium">
+        Get a scientific, personalized board recommendation based on your child's unique psychology in 5 minutes.
+      </p>
+
+      {/* 4. Social Proof Avatar Row */}
+      <div className="mt-12 flex flex-col items-center gap-4">
+          <div className="flex -space-x-4">
+              {[1,2,3,4,5].map(i => (
+                  <div key={i} className="w-12 h-12 rounded-full border-4 border-[#0F172A] bg-slate-700 flex items-center justify-center text-white font-bold text-xs overflow-hidden">
+                      <img src={`https://i.pravatar.cc/100?img=${i+10}`} className="w-full h-full object-cover" alt="Parent Avatar" />
+                  </div>
+              ))}
+              <div className="w-12 h-12 rounded-full border-4 border-[#0F172A] bg-[#FF6B35] flex items-center justify-center text-white font-black text-xs">
+                  1K+
+              </div>
+          </div>
+          <p className="text-slate-500 text-sm font-bold uppercase tracking-widest">
+              Joined by 1,000+ parents this week
+          </p>
+      </div>
+
+      {/* 5. The "Unstoppable" CTA Button */}
+      <div className="relative mt-16 group z-[9999]">
+        <div className="absolute -inset-4 bg-gradient-to-r from-[#FF6B35] via-orange-500 to-yellow-500 rounded-full blur-2xl opacity-40 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
         <button 
-          onClick={handleClick}
-          className="bg-brand-orange text-white px-10 py-5 rounded-full font-bold text-xl shadow-2xl hover:scale-105 transition-all mt-14 border-2 border-brand-orange"
+          onClick={triggerStart}
+          className="relative bg-[#FF6B35] text-white px-10 md:px-20 py-6 md:py-8 rounded-full font-black text-2xl md:text-4xl shadow-[0_20px_50px_rgba(255,107,53,0.5)] hover:scale-105 active:scale-95 transition-all border-b-[8px] border-orange-800 flex items-center gap-6"
+          style={{ pointerEvents: 'auto' }}
         >
-          Start Learning Fitment Analysis <span className="hero-arrow-massive">→</span>
+          {buttonText} <span className="animate-pulse inline-block text-4xl md:text-6xl">→</span>
         </button>
       </div>
+
+      {/* Background Atmosphere */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-blue-500/10 rounded-full blur-[180px] pointer-events-none" />
+
     </section>
   );
 };
 
+// Render the component on window load
 window.addEventListener('load', () => {
     const container = document.getElementById('react-hero-root');
     if (container) {
