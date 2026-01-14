@@ -36,20 +36,17 @@ const Hero = () => {
     triggerStart(1); // Launch at index 1 since 0 is answered
   };
 
-  // Critical Functional Fix: "Unstoppable" Global Click Listener
+  // Universal Click Fix: Target specific button text and ensure it's the button or direct child
   useEffect(() => {
     const handleGlobalClick = (e) => {
       const target = e.target;
       if (!target) return;
       
-      const text = target.textContent || "";
-      if (text.includes("Start Learning Fitment Analysis") || text.includes("Scan My Child's Academic Fitment")) {
-        console.log("Global Unstoppable Catch: CTA Clicked via text match:", text);
-        
-        if (text.includes("Start Learning Fitment Analysis")) {
-            setButtonText("Scan My Child's Academic Fitment");
-        }
-
+      // Fix: Check if the clicked element is specifically the button or a direct pulse/text span inside it
+      const isCtaClick = target.closest('.unstoppable-cta');
+      
+      if (isCtaClick) {
+        console.log("Global Unstoppable Catch: Targeted CTA Clicked");
         triggerStart(0);
       }
     };
@@ -65,26 +62,26 @@ const Hero = () => {
     <>
     <section className="relative pt-32 pb-20 px-4 overflow-hidden bg-[#0F172A] min-h-[95vh] flex flex-col items-center">
       
-      {/* 1. Top Right Shadow Buttons */}
+      {/* 1. Top Right Shadow Buttons - Restored with Light, Non-Eye-Catchy Colors */}
       <div className="absolute top-6 right-6 flex flex-col md:flex-row gap-4 z-[1000]">
           <button 
             onClick={() => window.openSyncMatchGate && window.openSyncMatchGate()} 
-            className="text-xs font-bold text-white border-2 border-[#FF6B35] px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl"
-            style={{background: 'rgba(30, 41, 59, 0.8)', cursor: 'pointer'}}
+            className="text-xs font-bold text-slate-400 border border-slate-700/50 px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl"
+            style={{background: 'rgba(30, 41, 59, 0.4)', cursor: 'pointer'}}
           >
               Unlock Parent & Child Sync Check
           </button>
           <a 
             href="https://xray.aptskola.com" 
             target="_blank" 
-            className="text-xs font-bold text-white border-2 border-[#FFD700] px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl text-center"
-            style={{background: 'rgba(30, 41, 59, 0.8)'}}
+            className="text-xs font-bold text-slate-400 border border-slate-700/50 px-5 py-2 rounded-full hover:bg-slate-800 transition backdrop-blur-sm shadow-xl text-center"
+            style={{background: 'rgba(30, 41, 59, 0.4)'}}
           >
               🔎 AI School/College Forensic Report
           </a>
       </div>
 
-      {/* 2. Centered Branding Block - Reduced mt-16 to mt-4 to decrease gap */}
+      {/* 2. Centered Branding Block */}
       <div className="mt-4 mb-12 text-center animate-fade-in-up">
         <h1 className="text-5xl md:text-6xl font-black text-white tracking-tighter">
           Apt <span className="text-[#FF6B35]">Skola</span>
@@ -143,12 +140,12 @@ const Hero = () => {
           </p>
       </div>
 
-      {/* 5. The "Unstoppable" CTA Button - Momentum Feature 3: Visual Cue */}
+      {/* 5. The "Unstoppable" CTA Button */}
       <div className="relative mt-16 group z-[9999]">
         <div className="absolute -inset-4 bg-gradient-to-r from-[#FF6B35] via-orange-500 to-yellow-500 rounded-full blur-2xl opacity-40 group-hover:opacity-75 transition duration-1000 group-hover:duration-200"></div>
         <button 
           onClick={() => triggerStart(0)}
-          className="cta-button-pulse relative bg-[#FF6B35] text-white px-8 md:px-12 py-4 md:py-6 rounded-full font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,107,53,0.5)] hover:scale-105 active:scale-95 transition-all border-b-[6px] border-orange-800 flex items-center gap-4"
+          className="unstoppable-cta cta-button-pulse relative bg-[#FF6B35] text-white px-8 md:px-12 py-4 md:py-6 rounded-full font-black text-xl md:text-2xl shadow-[0_20px_50px_rgba(255,107,53,0.5)] hover:scale-105 active:scale-95 transition-all border-b-[6px] border-orange-800 flex items-center gap-4"
           style={{ pointerEvents: 'auto', animationDelay: '3s' }}
         >
           {buttonText} <span className="animate-pulse inline-block text-3xl md:text-4xl">→</span>
